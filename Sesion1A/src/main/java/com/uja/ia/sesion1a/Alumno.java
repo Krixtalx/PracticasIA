@@ -16,26 +16,44 @@
  */
 package com.uja.ia.sesion1a;
 
-import java.io.InputStream;
+
 
 /**
  *
  * @author Niskp
  */
 public class Alumno {
+	protected final String nombre;
+	protected final String dni;
+	protected final String correoE;
 
-    protected String dni;
-    protected String nombre;
-    protected String email;
+	public Alumno() {
+		nombre = "";
+		dni = "";
+		correoE = "";
+	}	
+	
+	public Alumno(String nombre, String dni, String correoE) {
+		this.nombre = nombre;
+		this.dni = dni;
+		this.correoE = correoE;
+	}
 
-    public Alumno() {
-    }
+	public String getNombre() {
+		return nombre;
+	}
 
-    public Alumno(String dni, String nombre, String email) {
-        this.dni = dni;
-        this.nombre = nombre;
-        this.email = email;
-    }
-    
- 
+	public String getDni() {
+		return dni;
+	}
+  
+	public String getCorreoE() {
+		return correoE;
+	}
+
+	@Override
+	public String toString() {
+		return "Alumno{" + "nombre=" + nombre + ", dni=" + dni + ", correoE=" + correoE + '}';
+	}
+
 }
