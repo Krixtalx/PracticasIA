@@ -16,6 +16,8 @@
  */
 package com.uja.ia.sesion1a;
 
+import java.io.InputStream;
+
 /**
  *
  * @author Niskp
@@ -34,5 +36,6 @@ public class Alumno {
         this.nombre = nombre;
         this.email = email;
     }
-
+    
+ 
 }

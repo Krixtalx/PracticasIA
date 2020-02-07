@@ -16,19 +16,18 @@
  */
 package com.uja.ia.sesion1a;
 
-<<<<<<< Updated upstream
+
+
 /**
  *
  * @author Niskp
  */
-=======
+
 import java.io.*;
 
->>>>>>> Stashed changes
+
 public class Main {
 
-    
-    
     /**
      * @param args the command line arguments
      */
@@ -69,3 +68,4 @@ public class Main {
     }
 
 }
+
