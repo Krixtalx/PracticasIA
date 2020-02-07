@@ -16,6 +16,7 @@
  */
 package com.uja.ia.sesion1a;
 
+
 import java.io.*;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
  *
  * @author jcfp0003
  */
+
 public class Main {
 
 	private static final int NUM_NOTAS = 4;
@@ -46,6 +48,7 @@ public class Main {
 	public static void verAlumno(Alumno al) {
 		System.out.println(al);
 	}
+
 
 	/**
 	 * @param args the command line arguments
@@ -75,3 +78,4 @@ public class Main {
 	}
 
 }
+

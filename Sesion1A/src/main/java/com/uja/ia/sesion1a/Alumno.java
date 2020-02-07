@@ -17,6 +17,7 @@
 package com.uja.ia.sesion1a;
 
 
+
 /**
  *
  * @author Niskp
@@ -45,7 +46,7 @@ public class Alumno {
 	public String getDni() {
 		return dni;
 	}
-
+  
 	public String getCorreoE() {
 		return correoE;
 	}
@@ -54,6 +55,5 @@ public class Alumno {
 	public String toString() {
 		return "Alumno{" + "nombre=" + nombre + ", dni=" + dni + ", correoE=" + correoE + '}';
 	}
-	
-	
+
 }
