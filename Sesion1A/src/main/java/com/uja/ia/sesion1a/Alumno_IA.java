@@ -16,7 +16,6 @@
  */
 package com.uja.ia.sesion1a;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -25,36 +24,40 @@ import java.util.Scanner;
  */
 public class Alumno_IA extends Alumno {
 
-    private int grupoPracticas;
-    private float notaPracticas;
+	private final int grupoPracticas;
+	private final int notaPracticas;
 
-    public Alumno_IA() {
-        super();
-    }
+	public Alumno_IA() {
+		super();
+		grupoPracticas = 0;
+		notaPracticas = 0;
+	}
 
-    public Alumno_IA(int grupoPracticas, float notaPracticas) {
-        super();
-        this.grupoPracticas = grupoPracticas;
-        this.notaPracticas = notaPracticas;
-    }
+	public Alumno_IA(String nombre, String dni, String correoE, int grupo, int nota) {
+		super(nombre, dni, correoE);
+		grupoPracticas = grupo;
+		notaPracticas = nota;
+	}
 
-    public Alumno_IA(int grupoPracticas, float notaPracticas, String dni, String nombre, String email) {
-        super(dni, nombre, email);
-        this.grupoPracticas = grupoPracticas;
-        this.notaPracticas = notaPracticas;
-    }
+	public int getGrupoPracticas() {
+		return grupoPracticas;
+	}
 
-    public void calcularNota() {
-        int aux = 0, aux2=0;
-        Scanner reader = new Scanner(System.in);
-        for (int i = 0; i < 4; i++) {
-            System.out.print("Introduzca la nota " + i + ": ");
-            aux2=reader.nextInt();
-            aux += aux2;
-        }
-        notaPracticas = aux / 4;
-        System.out.println("\nNota de Prácticas del alumno " + nombre + ": " + notaPracticas);
+	public int getNotaPracticas() {
+		return notaPracticas;
+	}
 
-    }
-
+	public float calcularNota(int numNotas) {
+		Scanner sc = new Scanner(System.in);
+		float sumaNotas = 0;
+		for (int i = 0; i < numNotas; i++) {
+			System.out.println("Nota " + (i + 1));
+			String nota = sc.nextLine();
+			if (nota.contains(",")) {
+				nota = nota.replace(',', '.');
+			}
+			sumaNotas += Float.parseFloat(nota);
+		}
+		return sumaNotas / numNotas;
+	}
 }
