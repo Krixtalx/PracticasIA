@@ -20,19 +20,14 @@ package com.uja.ia.sesion1a;
  *
  * @author Niskp
  */
-public class Alumno {
+public class Main {
 
-    protected String dni;
-    protected String nombre;
-    protected String email;
-
-    public Alumno() {
-    }
-
-    public Alumno(String dni, String nombre, String email) {
-        this.dni = dni;
-        this.nombre = nombre;
-        this.email = email;
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        Alumno_IA test = new Alumno_IA(0, 0, "77690720D", "Jose Antonio", "jaca0011@red.ujaen.es");
+        test.calcularNota();
     }
 
 }
