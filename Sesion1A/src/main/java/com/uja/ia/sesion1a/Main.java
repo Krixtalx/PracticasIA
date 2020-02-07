@@ -28,6 +28,6 @@ public class Main {
     public static void main(String[] args) {
         Alumno_IA test = new Alumno_IA(0, 0, "77690720D", "Jose Antonio", "jaca0011@red.ujaen.es");
         test.calcularNota();
+        System.out.println("Esta es la Branch JA");
     }
-
 }
