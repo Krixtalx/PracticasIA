@@ -22,12 +22,18 @@ package com.uja.ia.sesion1a;
  */
 public class Main {
 
+    
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         Alumno_IA test = new Alumno_IA(0, 0, "77690720D", "Jose Antonio", "jaca0011@red.ujaen.es");
         test.calcularNota();
+
+        System.out.println("ESTO ES PA MI");
+
         System.out.println("Esta es la Branch JA");
+
     }
 }
