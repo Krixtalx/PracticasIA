@@ -27,17 +27,19 @@ public class M20A04a extends Mouse {
      * Variable para almacenar la ultima celda visitada
      */
     private Grid lastGrid;
+    Random generador;
+    boolean stuck = false;
 
     /**
      * Tabla hash para almacenar las celdas visitadas por el raton: Clave:
      * Coordenadas Valor: La celda
      */
-    private HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
+    private final HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
 
     /**
      * Pila para almacenar el camino recorrido.
      */
-    private Stack<Grid> pilaMovimientos;
+    private final Stack<Grid> pilaMovimientos;
 
     /**
      * Constructor (Puedes modificar el nombre a tu gusto).
@@ -46,6 +48,7 @@ public class M20A04a extends Mouse {
         super("MXXA04");
         celdasVisitadas = new HashMap<>();
         pilaMovimientos = new Stack<>();
+        generador = new Random();
     }
 
     /**
@@ -56,21 +59,93 @@ public class M20A04a extends Mouse {
      */
     @Override
     public int move(Grid currentGrid, Cheese cheese) {
-        if (currentGrid.canGoUp() && testGrid(Mouse.UP, currentGrid)) {
-            lastGrid=currentGrid;
-            
+        if (currentGrid.canGoUp() && testGrid(Mouse.UP, currentGrid) && !stuck) {
+            lastGrid = currentGrid;
+            pilaMovimientos.push(lastGrid);
             return Mouse.UP;
-        } else if (currentGrid.canGoRight() && testGrid(Mouse.RIGHT, currentGrid)) {
-            lastGrid=currentGrid;
+        } else if (currentGrid.canGoRight() && testGrid(Mouse.RIGHT, currentGrid) && !stuck) {
+            lastGrid = currentGrid;
+            pilaMovimientos.push(lastGrid);
             return Mouse.RIGHT;
-        } else if (currentGrid.canGoLeft() && testGrid(Mouse.LEFT, currentGrid)) {
-            lastGrid=currentGrid;
+        } else if (currentGrid.canGoLeft() && testGrid(Mouse.LEFT, currentGrid) && !stuck) {
+            lastGrid = currentGrid;
+            pilaMovimientos.push(lastGrid);
             return Mouse.LEFT;
-        } else if (currentGrid.canGoDown() && testGrid(Mouse.DOWN, currentGrid)) {
-            lastGrid=currentGrid;
+        } else if (currentGrid.canGoDown() && testGrid(Mouse.DOWN, currentGrid) && !stuck) {
+            lastGrid = currentGrid;
+            pilaMovimientos.push(lastGrid);
             return Mouse.DOWN;
+        } else if (stuck) {
+            System.out.println("Volviendo a anterior...");
+            int aux = volverAnterior(currentGrid);
+            if (aux != -1) {
+                return aux;
+            }else{
+                stuck=false;
+            }
+        }
+        stuck = true;
+        return -1;
+//        switch (generador.nextInt(4)) {
+//            case 1:
+//                if (currentGrid.canGoUp() && testGrid(Mouse.UP, currentGrid)) {
+//                    lastGrid = currentGrid;
+//                    pilaMovimientos.add(lastGrid);
+//                    return Mouse.UP;
+//                }
+//                break;
+//            case 2:
+//                if (currentGrid.canGoRight() && testGrid(Mouse.RIGHT, currentGrid)) {
+//                    lastGrid = currentGrid;
+//                    pilaMovimientos.add(lastGrid);
+//                    return Mouse.RIGHT;
+//                }
+//                break;
+//            case 3:
+//                if (currentGrid.canGoLeft() && testGrid(Mouse.LEFT, currentGrid)) {
+//                    lastGrid = currentGrid;
+//                    pilaMovimientos.add(lastGrid);
+//                    return Mouse.LEFT;
+//                }
+//                break;
+//            case 4:
+//                if (currentGrid.canGoDown() && testGrid(Mouse.DOWN, currentGrid)) {
+//                    lastGrid = currentGrid;
+//                    pilaMovimientos.add(lastGrid);
+//                    return Mouse.DOWN;
+//                }
+//                break;
+//        }
+//        return -1;
+    }
+
+    public int volverAnterior(Grid currentGrid) {
+        if (!pilaMovimientos.empty()) {
+            if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return Mouse.UP;
+            }
+            if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return Mouse.DOWN;
+            }
+            if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return Mouse.LEFT;
+            }
+            if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return Mouse.RIGHT;
+            }
         }
         return -1;
+    }
+    
+    public void addHashMap(Grid currentGrid){
+        celdasVisitadas.put(new Pair(currentGrid.getX(), currentGrid.getY()), currentGrid);
+        if(currentGrid.canGoDown()&&!visitada(currentGrid)){
+            
+        }
     }
 
     /**

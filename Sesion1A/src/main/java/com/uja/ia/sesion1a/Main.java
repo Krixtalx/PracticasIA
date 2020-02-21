@@ -16,66 +16,60 @@
  */
 package com.uja.ia.sesion1a;
 
-
 import java.io.*;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-
 /**
  *
  * @author jcfp0003
  */
-
 public class Main {
 
-	private static final int NUM_NOTAS = 4;
+    private static final int NUM_NOTAS = 4;
 
-	public static Alumno nuevoAlumno() {
-		Scanner sc = new Scanner(System.in);
-		String nombre, dni, correoE;
-		System.out.println("Nombre: ");
-		nombre = sc.nextLine();
-		System.out.println("DNI: ");
-		dni = sc.nextLine();
-		System.out.println("CorreoE: ");
-		correoE = sc.nextLine();
-		return new Alumno(nombre, dni, correoE);
-	}
+    public static Alumno nuevoAlumno() {
+        Scanner sc = new Scanner(System.in);
+        String nombre, dni, correoE;
+        System.out.println("Nombre: ");
+        nombre = sc.nextLine();
+        System.out.println("DNI: ");
+        dni = sc.nextLine();
+        System.out.println("CorreoE: ");
+        correoE = sc.nextLine();
+        return new Alumno(nombre, dni, correoE);
+    }
 
-	public static void verAlumno(Alumno al) {
-		System.out.println(al);
-	}
+    public static void verAlumno(Alumno al) {
+        System.out.println(al);
+    }
 
-
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String[] args) {
-		try (BufferedReader lector = new BufferedReader(new FileReader("datos.txt")); FileWriter archivoPares = new FileWriter("pares.txt")) {
-			String linea = lector.readLine();
-			while (linea != null) {
-				if (linea.length() > 0) {
-					//System.out.println("Elemento");
-					if((Integer.parseInt(linea.split(",")[1].replace(" ", "")) % 2) == 0){
-						archivoPares.write(linea);
-						archivoPares.write('\n');
-					}
-					linea = lector.readLine();
-				}
-			}
-			lector.close();
-			archivoPares.close();
-		} catch (FileNotFoundException ex) {
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-			System.exit(-1);
-		} catch (IOException ex) {
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-			System.exit(-2);
-		}
-	}
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        try (BufferedReader lector = new BufferedReader(new FileReader("datos.txt")); FileWriter archivoPares = new FileWriter("pares.txt")) {
+            String linea = lector.readLine();
+            while (linea != null) {
+                if (linea.length() > 0) {
+                    //System.out.println("Elemento");
+                    if ((Integer.parseInt(linea.split(",")[1].replace(" ", "")) % 2) == 0) {
+                        archivoPares.write(linea);
+                        archivoPares.write('\n');
+                    }
+                    linea = lector.readLine();
+                }
+            }
+            lector.close();
+            archivoPares.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(-1);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(-2);
+        }
+    }
 
 }
-

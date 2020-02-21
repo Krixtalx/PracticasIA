@@ -16,44 +16,43 @@
  */
 package com.uja.ia.sesion1a;
 
-
-
 /**
  *
  * @author Niskp
  */
 public class Alumno {
-	protected final String nombre;
-	protected final String dni;
-	protected final String correoE;
 
-	public Alumno() {
-		nombre = "";
-		dni = "";
-		correoE = "";
-	}	
-	
-	public Alumno(String nombre, String dni, String correoE) {
-		this.nombre = nombre;
-		this.dni = dni;
-		this.correoE = correoE;
-	}
+    protected final String nombre;
+    protected final String dni;
+    protected final String correoE;
 
-	public String getNombre() {
-		return nombre;
-	}
+    public Alumno() {
+        nombre = "";
+        dni = "";
+        correoE = "";
+    }
 
-	public String getDni() {
-		return dni;
-	}
-  
-	public String getCorreoE() {
-		return correoE;
-	}
+    public Alumno(String nombre, String dni, String correoE) {
+        this.nombre = nombre;
+        this.dni = dni;
+        this.correoE = correoE;
+    }
 
-	@Override
-	public String toString() {
-		return "Alumno{" + "nombre=" + nombre + ", dni=" + dni + ", correoE=" + correoE + '}';
-	}
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public String getCorreoE() {
+        return correoE;
+    }
+
+    @Override
+    public String toString() {
+        return "Alumno{" + "nombre=" + nombre + ", dni=" + dni + ", correoE=" + correoE + '}';
+    }
 
 }

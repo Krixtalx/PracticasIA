@@ -24,40 +24,40 @@ import java.util.Scanner;
  */
 public class Alumno_IA extends Alumno {
 
-	private final int grupoPracticas;
-	private final int notaPracticas;
+    private final int grupoPracticas;
+    private final int notaPracticas;
 
-	public Alumno_IA() {
-		super();
-		grupoPracticas = 0;
-		notaPracticas = 0;
-	}
+    public Alumno_IA() {
+        super();
+        grupoPracticas = 0;
+        notaPracticas = 0;
+    }
 
-	public Alumno_IA(String nombre, String dni, String correoE, int grupo, int nota) {
-		super(nombre, dni, correoE);
-		grupoPracticas = grupo;
-		notaPracticas = nota;
-	}
+    public Alumno_IA(String nombre, String dni, String correoE, int grupo, int nota) {
+        super(nombre, dni, correoE);
+        grupoPracticas = grupo;
+        notaPracticas = nota;
+    }
 
-	public int getGrupoPracticas() {
-		return grupoPracticas;
-	}
+    public int getGrupoPracticas() {
+        return grupoPracticas;
+    }
 
-	public int getNotaPracticas() {
-		return notaPracticas;
-	}
+    public int getNotaPracticas() {
+        return notaPracticas;
+    }
 
-	public float calcularNota(int numNotas) {
-		Scanner sc = new Scanner(System.in);
-		float sumaNotas = 0;
-		for (int i = 0; i < numNotas; i++) {
-			System.out.println("Nota " + (i + 1));
-			String nota = sc.nextLine();
-			if (nota.contains(",")) {
-				nota = nota.replace(',', '.');
-			}
-			sumaNotas += Float.parseFloat(nota);
-		}
-		return sumaNotas / numNotas;
-	}
+    public float calcularNota(int numNotas) {
+        Scanner sc = new Scanner(System.in);
+        float sumaNotas = 0;
+        for (int i = 0; i < numNotas; i++) {
+            System.out.println("Nota " + (i + 1));
+            String nota = sc.nextLine();
+            if (nota.contains(",")) {
+                nota = nota.replace(',', '.');
+            }
+            sumaNotas += Float.parseFloat(nota);
+        }
+        return sumaNotas / numNotas;
+    }
 }
