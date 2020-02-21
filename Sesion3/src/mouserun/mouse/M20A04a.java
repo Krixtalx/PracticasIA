@@ -15,9 +15,11 @@ import mouserun.game.Grid;
 import mouserun.game.Cheese;
 
 /**
- * Clase que contiene el esqueleto del raton base para las prácticas de Inteligencia Artificial del curso 2019-20.
- * 
- * @author Cristóbal José Carmona (ccarmona@ujaen.es) y Ángel Miguel García Vico (agvico@ujaen.es)
+ * Clase que contiene el esqueleto del raton base para las prácticas de
+ * Inteligencia Artificial del curso 2019-20.
+ *
+ * @author Cristóbal José Carmona (ccarmona@ujaen.es) y Ángel Miguel García Vico
+ * (agvico@ujaen.es)
  */
 public class M20A04a extends Mouse {
 
@@ -25,20 +27,18 @@ public class M20A04a extends Mouse {
      * Variable para almacenar la ultima celda visitada
      */
     private Grid lastGrid;
-    
+
     /**
-     * Tabla hash para almacenar las celdas visitadas por el raton:
-     * Clave: Coordenadas
-     * Valor: La celda
+     * Tabla hash para almacenar las celdas visitadas por el raton: Clave:
+     * Coordenadas Valor: La celda
      */
     private HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
-    
+
     /**
      * Pila para almacenar el camino recorrido.
      */
     private Stack<Grid> pilaMovimientos;
-    
-    
+
     /**
      * Constructor (Puedes modificar el nombre a tu gusto).
      */
@@ -49,14 +49,28 @@ public class M20A04a extends Mouse {
     }
 
     /**
-     * @brief Método principal para el movimiento del raton. Incluye la gestión de cuando un queso aparece o no.
+     * @brief Método principal para el movimiento del raton. Incluye la gestión
+     * de cuando un queso aparece o no.
      * @param currentGrid Celda actual
      * @param cheese Queso
      */
     @Override
-    public int move(Grid currentGrid, Cheese cheese) {  
-
-        return 0; // DEBES BORRAR ESTO CUANDO EMPIECES A PROGRAMAR TU METODO.
+    public int move(Grid currentGrid, Cheese cheese) {
+        if (currentGrid.canGoUp() && testGrid(Mouse.UP, currentGrid)) {
+            lastGrid=currentGrid;
+            
+            return Mouse.UP;
+        } else if (currentGrid.canGoRight() && testGrid(Mouse.RIGHT, currentGrid)) {
+            lastGrid=currentGrid;
+            return Mouse.RIGHT;
+        } else if (currentGrid.canGoLeft() && testGrid(Mouse.LEFT, currentGrid)) {
+            lastGrid=currentGrid;
+            return Mouse.LEFT;
+        } else if (currentGrid.canGoDown() && testGrid(Mouse.DOWN, currentGrid)) {
+            lastGrid=currentGrid;
+            return Mouse.DOWN;
+        }
+        return -1;
     }
 
     /**
@@ -64,7 +78,6 @@ public class M20A04a extends Mouse {
      */
     @Override
     public void newCheese() {
-
 
     }
 
@@ -113,7 +126,8 @@ public class M20A04a extends Mouse {
     }
 
     /**
-     * @brief Método que devuelve si de una casilla dada, está contenida en el mapa de celdasVisitadas
+     * @brief Método que devuelve si de una casilla dada, está contenida en el
+     * mapa de celdasVisitadas
      * @param casilla Casilla que se pasa para saber si ha sido visitada
      * @return True Si esa casilla ya la había visitado
      */
@@ -122,8 +136,9 @@ public class M20A04a extends Mouse {
         return celdasVisitadas.containsKey(par);
     }
 
-   /**
-     * @brief Método para calcular si una casilla está en una posición relativa respecto a otra
+    /**
+     * @brief Método para calcular si una casilla está en una posición relativa
+     * respecto a otra
      * @param actual Celda actual
      * @param anterior Celda anterior
      * @return True Si la posición Y de la actual es mayor que la de la anterior
@@ -133,7 +148,8 @@ public class M20A04a extends Mouse {
     }
 
     /**
-     * @brief Método para calcular si una casilla está en una posición relativa respecto a otra
+     * @brief Método para calcular si una casilla está en una posición relativa
+     * respecto a otra
      * @param actual Celda actual
      * @param anterior Celda anterior
      * @return True Si la posición Y de la actual es menor que la de la anterior
@@ -141,9 +157,10 @@ public class M20A04a extends Mouse {
     public boolean actualAbajo(Grid actual, Grid anterior) {
         return actual.getY() < anterior.getY();
     }
-    
+
     /**
-     * @brief Método para calcular si una casilla está en una posición relativa respecto a otra
+     * @brief Método para calcular si una casilla está en una posición relativa
+     * respecto a otra
      * @param actual Celda actual
      * @param anterior Celda anterior
      * @return True Si la posición X de la actual es mayor que la de la anterior
@@ -151,9 +168,10 @@ public class M20A04a extends Mouse {
     public boolean actualDerecha(Grid actual, Grid anterior) {
         return actual.getX() > anterior.getX();
     }
-    
+
     /**
-     * @brief Método para calcular si una casilla está en una posición relativa respecto a otra
+     * @brief Método para calcular si una casilla está en una posición relativa
+     * respecto a otra
      * @param actual Celda actual
      * @param anterior Celda anterior
      * @return True Si la posición X de la actual es menor que la de la anterior
@@ -161,6 +179,5 @@ public class M20A04a extends Mouse {
     public boolean actualIzquierda(Grid actual, Grid anterior) {
         return actual.getX() < anterior.getX();
     }
-    
 
 }
