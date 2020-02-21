@@ -19,7 +19,7 @@ import mouserun.game.Cheese;
  * 
  * @author Cristóbal José Carmona (ccarmona@ujaen.es) y Ángel Miguel García Vico (agvico@ujaen.es)
  */
-public class MXXA04 extends Mouse {
+public class M20A04a extends Mouse {
 
     /**
      * Variable para almacenar la ultima celda visitada
@@ -42,7 +42,7 @@ public class MXXA04 extends Mouse {
     /**
      * Constructor (Puedes modificar el nombre a tu gusto).
      */
-    public MXXA04() {
+    public M20A04a() {
         super("MXXA04");
         celdasVisitadas = new HashMap<>();
         pilaMovimientos = new Stack<>();
