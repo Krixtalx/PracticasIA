@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mouserun.mouse;
 
 import java.util.ArrayList;
@@ -61,22 +56,22 @@ public class M20A04a extends Mouse {
      */
     @Override
     public int move(Grid currentGrid, Cheese cheese) {
-        if (currentGrid.canGoUp() && testGrid(Mouse.UP, currentGrid) && !stuck) {
+        if (currentGrid.canGoUp() && testGrid(Mouse.UP, currentGrid) && !visitada(currentGrid) && !stuck) {
             lastGrid = currentGrid;
             pilaMovimientos.push(lastGrid);
             addHashMap(currentGrid);
             return Mouse.UP;
-        } else if (currentGrid.canGoRight() && testGrid(Mouse.RIGHT, currentGrid) && !stuck) {
+        } else if (currentGrid.canGoRight() && testGrid(Mouse.RIGHT, currentGrid) && !visitada(currentGrid) && !stuck) {
             lastGrid = currentGrid;
             pilaMovimientos.push(lastGrid);
             addHashMap(currentGrid);
             return Mouse.RIGHT;
-        } else if (currentGrid.canGoLeft() && testGrid(Mouse.LEFT, currentGrid) && !stuck) {
+        } else if (currentGrid.canGoLeft() && testGrid(Mouse.LEFT, currentGrid) && !visitada(currentGrid) && !stuck) {
             lastGrid = currentGrid;
             pilaMovimientos.push(lastGrid);
             addHashMap(currentGrid);
             return Mouse.LEFT;
-        } else if (currentGrid.canGoDown() && testGrid(Mouse.DOWN, currentGrid) && !stuck) {
+        } else if (currentGrid.canGoDown() && testGrid(Mouse.DOWN, currentGrid) && !visitada(currentGrid) && !stuck) {
             lastGrid = currentGrid;
             pilaMovimientos.push(lastGrid);
             addHashMap(currentGrid);
@@ -98,7 +93,16 @@ public class M20A04a extends Mouse {
         }
         return -1;
     }
-    
+
+    public int tomaDecision(Grid currentGrid) {
+        return -1;
+    }
+
+    /**
+     * @brief Vuelve a la posicion que indique la pilaMovimientos
+     * @param currentGrid
+     * @return
+     */
     public int volverAnterior(Grid currentGrid) {
         if (!pilaMovimientos.empty()) {
             if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
@@ -120,21 +124,29 @@ public class M20A04a extends Mouse {
         }
         return -1;
     }
-    
+
+    /**
+     * @brief Añade el Grid actual al Hashmap y al ArrayList posiblesCaminos los
+     * posibles caminos
+     * @param currentGrid
+     */
     public void addHashMap(Grid currentGrid) {
-        celdasVisitadas.put(new Pair(currentGrid.getX(), currentGrid.getY()), currentGrid);
+        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY()))) {
+            celdasVisitadas.put(new Pair(currentGrid.getX(), currentGrid.getY()), currentGrid);
+            incExploredGrids();
+        }
         if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY() - 1)) && currentGrid.canGoDown()) {
             posiblesCaminos.add(currentGrid);
-            
+
         } else if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY() + 1)) && currentGrid.canGoUp()) {
             posiblesCaminos.add(currentGrid);
-            
+
         } else if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() - 1, currentGrid.getY())) && currentGrid.canGoLeft()) {
             posiblesCaminos.add(currentGrid);
-            
+
         } else if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() + 1, currentGrid.getY())) && currentGrid.canGoRight()) {
             posiblesCaminos.add(currentGrid);
-            
+
         }
     }
 
@@ -143,7 +155,7 @@ public class M20A04a extends Mouse {
      */
     @Override
     public void newCheese() {
-        
+
     }
 
     /**
@@ -151,7 +163,7 @@ public class M20A04a extends Mouse {
      */
     @Override
     public void respawned() {
-        
+
     }
 
     /**
@@ -164,30 +176,30 @@ public class M20A04a extends Mouse {
         if (lastGrid == null) {
             return true;
         }
-        
+
         int x = currentGrid.getX();
         int y = currentGrid.getY();
-        
+
         switch (direction) {
             case Mouse.UP:
                 y += 1;
                 break;
-            
+
             case Mouse.DOWN:
                 y -= 1;
                 break;
-            
+
             case Mouse.LEFT:
                 x -= 1;
                 break;
-            
+
             case Mouse.RIGHT:
                 x += 1;
                 break;
         }
-        
+
         return !(lastGrid.getX() == x && lastGrid.getY() == y);
-        
+
     }
 
     /**
@@ -198,7 +210,7 @@ public class M20A04a extends Mouse {
      */
     public boolean visitada(Grid casilla) {
         Pair par = new Pair(casilla.getX(), casilla.getY());
-        return celdasVisitadas.containsKey(par);
+        return celdasVisitadas.containsKey(par) && !posiblesCaminos.contains(casilla);
     }
 
     /**
@@ -244,5 +256,5 @@ public class M20A04a extends Mouse {
     public boolean actualIzquierda(Grid actual, Grid anterior) {
         return actual.getX() < anterior.getX();
     }
-    
+
 }
