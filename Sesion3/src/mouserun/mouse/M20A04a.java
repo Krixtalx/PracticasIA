@@ -23,6 +23,7 @@ public class M20A04a extends Mouse {
      */
     private Grid lastGrid;
     Random generador;
+    private int movAnterior;
     boolean stuck = false;
 
     /**
@@ -31,6 +32,7 @@ public class M20A04a extends Mouse {
      */
     private final HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
     private final ArrayList<Grid> posiblesCaminos;
+    private final ArrayList<Integer> posiblesMovActuales;
 
     /**
      * Pila para almacenar el camino recorrido.
@@ -46,6 +48,7 @@ public class M20A04a extends Mouse {
         pilaMovimientos = new Stack<>();
         generador = new Random();
         posiblesCaminos = new ArrayList<>();
+        posiblesMovActuales = new ArrayList<>();
     }
 
     /**
@@ -56,46 +59,70 @@ public class M20A04a extends Mouse {
      */
     @Override
     public int move(Grid currentGrid, Cheese cheese) {
-        if (currentGrid.canGoUp() && testGrid(Mouse.UP, currentGrid) && !visitada(currentGrid) && !stuck) {
-            lastGrid = currentGrid;
-            pilaMovimientos.push(lastGrid);
-            addHashMap(currentGrid);
-            return Mouse.UP;
-        } else if (currentGrid.canGoRight() && testGrid(Mouse.RIGHT, currentGrid) && !visitada(currentGrid) && !stuck) {
-            lastGrid = currentGrid;
-            pilaMovimientos.push(lastGrid);
-            addHashMap(currentGrid);
-            return Mouse.RIGHT;
-        } else if (currentGrid.canGoLeft() && testGrid(Mouse.LEFT, currentGrid) && !visitada(currentGrid) && !stuck) {
-            lastGrid = currentGrid;
-            pilaMovimientos.push(lastGrid);
-            addHashMap(currentGrid);
-            return Mouse.LEFT;
-        } else if (currentGrid.canGoDown() && testGrid(Mouse.DOWN, currentGrid) && !visitada(currentGrid) && !stuck) {
-            lastGrid = currentGrid;
-            pilaMovimientos.push(lastGrid);
-            addHashMap(currentGrid);
-            return Mouse.DOWN;
-        } else if (stuck) {
-            if (posiblesCaminos.contains(currentGrid)) {
-                stuck = false;
-            } else {
-                int aux = volverAnterior(currentGrid);
-                if (aux != -1) {
-                    return aux;
-                } else {
-                    stuck = false;
-                }
-            }
-        }
-        if (!posiblesCaminos.contains(currentGrid)) {
-            stuck = true;
-        }
-        return -1;
+        return tomaDecision(currentGrid);
     }
 
     public int tomaDecision(Grid currentGrid) {
-        return -1;
+        posiblesMovActuales.clear();
+        if (!stuck) {
+            switch (movAnterior) {
+                case UP:
+                    if (currentGrid.canGoUp() && !currentGrid.canGoRight() && !currentGrid.canGoLeft() && !visitada(currentGrid, UP)) {
+                        pilaMovimientos.push(currentGrid);
+                        addHashMap(currentGrid);
+                        return UP;
+                    }
+                    break;
+                case DOWN:
+                    if (currentGrid.canGoDown() && !currentGrid.canGoRight() && !currentGrid.canGoLeft() && !visitada(currentGrid, DOWN)) {
+                        pilaMovimientos.push(currentGrid);
+                        addHashMap(currentGrid);
+                        return DOWN;
+                    }
+                    break;
+
+                case LEFT:
+                    if (currentGrid.canGoLeft() && !currentGrid.canGoDown() && !currentGrid.canGoUp() && !visitada(currentGrid, LEFT)) {
+                        pilaMovimientos.push(currentGrid);
+                        addHashMap(currentGrid);
+                        return LEFT;
+                    }
+                    break;
+
+                case RIGHT:
+                    if (currentGrid.canGoRight() && !currentGrid.canGoDown() && !currentGrid.canGoUp() && !visitada(currentGrid, RIGHT)) {
+                        pilaMovimientos.push(currentGrid);
+                        addHashMap(currentGrid);
+                        return RIGHT;
+                    }
+                    break;
+            }
+
+            if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
+                posiblesMovActuales.add(UP);
+            }
+            if (currentGrid.canGoDown() && !visitada(currentGrid, DOWN)) {
+                posiblesMovActuales.add(DOWN);
+            }
+            if (currentGrid.canGoLeft() && !visitada(currentGrid, LEFT)) {
+                posiblesMovActuales.add(LEFT);
+            }
+            if (currentGrid.canGoRight() && !visitada(currentGrid, RIGHT)) {
+                posiblesMovActuales.add(RIGHT);
+            }
+        }
+
+        if (posiblesMovActuales.isEmpty()) {
+            stuck = true;
+            movAnterior = volverAnterior(currentGrid);
+        } else {
+            movAnterior = posiblesMovActuales.get(generador.nextInt(posiblesMovActuales.size()));
+            pilaMovimientos.push(currentGrid);
+        }
+        debug();
+        posiblesCaminos.remove(currentGrid);
+        addHashMap(currentGrid);
+        return movAnterior;
     }
 
     /**
@@ -105,24 +132,44 @@ public class M20A04a extends Mouse {
      */
     public int volverAnterior(Grid currentGrid) {
         if (!pilaMovimientos.empty()) {
-            if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return Mouse.UP;
-            }
-            if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return Mouse.DOWN;
-            }
-            if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return Mouse.LEFT;
-            }
-            if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return Mouse.RIGHT;
+            if (posiblesCaminos.contains(currentGrid)) {
+                stuck = false;
+                posiblesCaminos.remove(currentGrid);
+                pilaMovimientos.push(currentGrid);
+                if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
+                    return UP;
+                }
+                if (currentGrid.canGoDown() && !visitada(currentGrid, DOWN)) {
+                    return DOWN;
+                }
+                if (currentGrid.canGoLeft() && !visitada(currentGrid, LEFT)) {
+                    return LEFT;
+                }
+                if (currentGrid.canGoRight() && !visitada(currentGrid, RIGHT)) {
+                    return RIGHT;
+                }
+            } else {
+                if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
+                    pilaMovimientos.pop();
+                    return UP;
+                }
+                if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
+                    pilaMovimientos.pop();
+                    return DOWN;
+                }
+                if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
+                    pilaMovimientos.pop();
+                    return LEFT;
+                }
+                if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
+                    pilaMovimientos.pop();
+                    return RIGHT;
+                }
             }
         }
-        return -1;
+        pilaMovimientos.pop();
+        stuck = false;
+        return 5;
     }
 
     /**
@@ -131,22 +178,40 @@ public class M20A04a extends Mouse {
      * @param currentGrid
      */
     public void addHashMap(Grid currentGrid) {
+        int numCaminos = 0;
         if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY()))) {
             celdasVisitadas.put(new Pair(currentGrid.getX(), currentGrid.getY()), currentGrid);
             incExploredGrids();
         }
+
         if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY() - 1)) && currentGrid.canGoDown()) {
             posiblesCaminos.add(currentGrid);
+            numCaminos++;
 
-        } else if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY() + 1)) && currentGrid.canGoUp()) {
-            posiblesCaminos.add(currentGrid);
+        }
+        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY() + 1)) && currentGrid.canGoUp()) {
+            if (numCaminos > 0) {
+                posiblesCaminos.add(currentGrid);
+            }
+            numCaminos++;
 
-        } else if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() - 1, currentGrid.getY())) && currentGrid.canGoLeft()) {
-            posiblesCaminos.add(currentGrid);
+        }
+        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() - 1, currentGrid.getY())) && currentGrid.canGoLeft()) {
+            if (numCaminos > 0) {
+                posiblesCaminos.add(currentGrid);
+            }
+            numCaminos++;
 
-        } else if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() + 1, currentGrid.getY())) && currentGrid.canGoRight()) {
-            posiblesCaminos.add(currentGrid);
+        }
+        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() + 1, currentGrid.getY())) && currentGrid.canGoRight()) {
+            if (numCaminos > 0) {
+                posiblesCaminos.add(currentGrid);
+            }
+            numCaminos++;
 
+        }
+        if (numCaminos < 2) {
+            posiblesCaminos.remove(currentGrid);
         }
     }
 
@@ -181,19 +246,19 @@ public class M20A04a extends Mouse {
         int y = currentGrid.getY();
 
         switch (direction) {
-            case Mouse.UP:
+            case UP:
                 y += 1;
                 break;
 
-            case Mouse.DOWN:
+            case DOWN:
                 y -= 1;
                 break;
 
-            case Mouse.LEFT:
+            case LEFT:
                 x -= 1;
                 break;
 
-            case Mouse.RIGHT:
+            case RIGHT:
                 x += 1;
                 break;
         }
@@ -203,14 +268,45 @@ public class M20A04a extends Mouse {
     }
 
     /**
+     *
      * @brief Método que devuelve si de una casilla dada, está contenida en el
      * mapa de celdasVisitadas
      * @param casilla Casilla que se pasa para saber si ha sido visitada
+     * @param direccion
      * @return True Si esa casilla ya la había visitado
      */
-    public boolean visitada(Grid casilla) {
-        Pair par = new Pair(casilla.getX(), casilla.getY());
-        return celdasVisitadas.containsKey(par) && !posiblesCaminos.contains(casilla);
+    public boolean visitada(Grid casilla, int direccion) {
+        int x = casilla.getX();
+        int y = casilla.getY();
+
+        switch (direccion) {
+            case UP:
+                y += 1;
+                break;
+
+            case DOWN:
+                y -= 1;
+                break;
+
+            case LEFT:
+                x -= 1;
+                break;
+
+            case RIGHT:
+                x += 1;
+                break;
+        }
+        Pair par = new Pair(x, y);
+        return celdasVisitadas.containsKey(par);
+    }
+
+    private void debug() {
+        System.out.println("\n-------------------------------------------------------------------");
+        System.out.println(posiblesMovActuales.size() + " posibles movimientos");
+        System.out.println(celdasVisitadas.size() + " celdas visitadas");
+        System.out.println(posiblesCaminos.size() + " posibles caminos");
+        System.out.println(pilaMovimientos.size() + " movimientos guardados");
+        System.out.println("-------------------------------------------------------------------\n");
     }
 
     /**
