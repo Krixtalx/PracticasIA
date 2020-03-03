@@ -145,47 +145,46 @@ public class M20A04a extends Mouse {
      * @return
      */
     public int volverAnterior(Grid currentGrid) {
-        if (!pilaMovimientos.empty()) {
-            if (posiblesCaminos.containsKey(new Pair(currentGrid.getX(), currentGrid.getY()))) {
-                stuck = false;
-                posiblesCaminos.remove(new Pair(currentGrid.getX(), currentGrid.getY()));
-                pilaMovimientos.push(currentGrid);
-                if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
-                    return UP;
-                }
-                if (currentGrid.canGoDown() && !visitada(currentGrid, DOWN)) {
-                    return DOWN;
-                }
-                if (currentGrid.canGoLeft() && !visitada(currentGrid, LEFT)) {
-                    return LEFT;
-                }
-                if (currentGrid.canGoRight() && !visitada(currentGrid, RIGHT)) {
-                    return RIGHT;
-                }
-            } else {
-                while (!pilaMovimientos.isEmpty()) {
-                    if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
-                        pilaMovimientos.pop();
-                        return UP;
-                    }
-                    if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
-                        pilaMovimientos.pop();
-                        return DOWN;
-                    }
-                    if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
-                        pilaMovimientos.pop();
-                        return LEFT;
-                    }
-                    if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
-                        pilaMovimientos.pop();
-                        return RIGHT;
-                    }
-                    pilaMovimientos.pop();
-                }
+
+        if (posiblesCaminos.containsKey(new Pair(currentGrid.getX(), currentGrid.getY()))) {
+            stuck = false;
+            posiblesCaminos.remove(new Pair(currentGrid.getX(), currentGrid.getY()));
+            pilaMovimientos.push(currentGrid);
+            if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
+                return UP;
+            }
+            if (currentGrid.canGoDown() && !visitada(currentGrid, DOWN)) {
+                return DOWN;
+            }
+            if (currentGrid.canGoLeft() && !visitada(currentGrid, LEFT)) {
+                return LEFT;
+            }
+            if (currentGrid.canGoRight() && !visitada(currentGrid, RIGHT)) {
+                return RIGHT;
             }
         }
+        while (!pilaMovimientos.isEmpty()) {
+            if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return UP;
+            }
+            if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return DOWN;
+            }
+            if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return LEFT;
+            }
+            if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
+                pilaMovimientos.pop();
+                return RIGHT;
+            }
+            pilaMovimientos.pop();
+        }
+
         stuck = false;
-        return 5;
+        return BOMB;
     }
 
     /**
