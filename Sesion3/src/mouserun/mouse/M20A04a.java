@@ -68,11 +68,11 @@ public class M20A04a extends Mouse {
     @Override
     public int move(Grid currentGrid, Cheese cheese) {
 
-        if (!bombaPuesta && currentGrid.canGoDown() && currentGrid.canGoLeft() && currentGrid.canGoRight() && currentGrid.canGoUp()) {
-            bombaPuesta = true;
-            return BOMB;
-        }
-        bombaPuesta = false;
+//        if (!bombaPuesta && currentGrid.canGoDown() && currentGrid.canGoLeft() && currentGrid.canGoRight() && currentGrid.canGoUp()) {
+//            bombaPuesta = true;
+//            return BOMB;
+//        }
+//        bombaPuesta = false;
         return tomaDecision(currentGrid);
     }
 
@@ -163,27 +163,26 @@ public class M20A04a extends Mouse {
                     return RIGHT;
                 }
             } else {
-                if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
+                while (!pilaMovimientos.isEmpty()) {
+                    if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
+                        pilaMovimientos.pop();
+                        return UP;
+                    }
+                    if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
+                        pilaMovimientos.pop();
+                        return DOWN;
+                    }
+                    if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
+                        pilaMovimientos.pop();
+                        return LEFT;
+                    }
+                    if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
+                        pilaMovimientos.pop();
+                        return RIGHT;
+                    }
                     pilaMovimientos.pop();
-                    return UP;
-                }
-                if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
-                    pilaMovimientos.pop();
-                    return DOWN;
-                }
-                if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
-                    pilaMovimientos.pop();
-                    return LEFT;
-                }
-                if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
-                    pilaMovimientos.pop();
-                    return RIGHT;
                 }
             }
-        }
-
-        if (!pilaMovimientos.isEmpty()) {
-            pilaMovimientos.pop();
         }
         stuck = false;
         return 5;
