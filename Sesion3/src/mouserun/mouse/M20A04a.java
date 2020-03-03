@@ -23,24 +23,25 @@ public class M20A04a extends Mouse {
      */
     private Grid lastGrid;
     Random generador;
+    
     /**
      * Variable para guardar el anterior movimiento realizado
      */
     private int movAnterior;
+    private int corrupta = 0; //Borrar al terminar
 
     /**
      * Boolean donde se almacena el estado del raton
      */
-    boolean stuck = false;
-    boolean bombaPuesta = false;
+    private boolean stuck = false;
 
     /**
-     * Tabla hash para almacenar las celdas visitadas por el raton: Clave:
-     * Coordenadas Valor: La celda
+     * Tabla hash para almacenar las celdas visitadas por el raton:
+     * Clave:Coordenadas Valor: La celda
      */
     private final HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
     private final HashMap<Pair<Integer, Integer>, Grid> posiblesCaminos;
-    private final ArrayList<Integer> posiblesMovActuales;
+    private final ArrayList<Integer> posiblesMovActuales; //ArrayList auxiliar para almacenar los posibles movimientos que se realizaran.
 
     /**
      * Pila para almacenar el camino recorrido.
@@ -68,11 +69,6 @@ public class M20A04a extends Mouse {
     @Override
     public int move(Grid currentGrid, Cheese cheese) {
 
-//        if (!bombaPuesta && currentGrid.canGoDown() && currentGrid.canGoLeft() && currentGrid.canGoRight() && currentGrid.canGoUp()) {
-//            bombaPuesta = true;
-//            return BOMB;
-//        }
-//        bombaPuesta = false;
         return tomaDecision(currentGrid);
     }
 
@@ -140,9 +136,11 @@ public class M20A04a extends Mouse {
     }
 
     /**
-     * @brief Vuelve a la posicion que indique la pilaMovimientos
-     * @param currentGrid
-     * @return
+     * @brief Vuelve a la posicion que indique la pilaMovimientos. Si se
+     * encuentra en un Grid marcado como posible camino coge un nuevo camino no
+     * visitado para explorar.
+     * @param currentGrid Grid actual
+     * @return Movimiento a tomar
      */
     public int volverAnterior(Grid currentGrid) {
 
@@ -181,6 +179,7 @@ public class M20A04a extends Mouse {
                 return RIGHT;
             }
             pilaMovimientos.pop();
+            corrupta++;
         }
 
         stuck = false;
@@ -190,7 +189,7 @@ public class M20A04a extends Mouse {
     /**
      * @brief Añade el Grid actual al Hashmap y al ArrayList posiblesCaminos los
      * posibles caminos
-     * @param currentGrid
+     * @param currentGrid Grid en el que se encuentra el ratón actualmente
      */
     public void addHashMap(Grid currentGrid) {
         int numCaminos = 0;
@@ -273,8 +272,9 @@ public class M20A04a extends Mouse {
      * @brief Método que devuelve si de una casilla dada, está contenida en el
      * mapa de celdasVisitadas
      * @param casilla Casilla que se pasa para saber si ha sido visitada
-     * @param direccion
-     * @return True Si esa casilla ya la había visitado
+     * @param direccion Dirección de la casilla visitada
+     * @return True Si la casilla vecina que indica la dirección había sido
+     * visitada
      */
     public boolean visitada(Grid casilla, int direccion) {
         int x = casilla.getX();
@@ -301,12 +301,16 @@ public class M20A04a extends Mouse {
         return celdasVisitadas.containsKey(par);
     }
 
+    /**
+     * Función de Debug. Borrar al final.
+     */
     private void debug() {
         System.out.println("\n-------------------------------------------------------------------");
         System.out.println(posiblesMovActuales.size() + " posibles movimientos");
         System.out.println(celdasVisitadas.size() + " celdas visitadas");
         System.out.println(posiblesCaminos.size() + " posibles caminos");
         System.out.println(pilaMovimientos.size() + " movimientos guardados");
+        System.out.println(corrupta + " veces pila corrupta");
         System.out.println("-------------------------------------------------------------------\n");
     }
 
