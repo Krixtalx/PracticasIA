@@ -16,14 +16,14 @@ import mouserun.game.Cheese;
  * @author Cristóbal José Carmona (ccarmona@ujaen.es) y Ángel Miguel García Vico
  * (agvico@ujaen.es)
  */
-public class M20A04a extends Mouse {
+public class M20A04aDFS extends Mouse {
 
     /**
      * Variable para almacenar la ultima celda visitada
      */
     private Grid lastGrid;
     Random generador;
-    
+
     /**
      * Variable para guardar el anterior movimiento realizado
      */
@@ -41,6 +41,7 @@ public class M20A04a extends Mouse {
      */
     private final HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
     private final HashMap<Pair<Integer, Integer>, Grid> posiblesCaminos;
+    private final HashMap<Pair<Integer, Integer>, ArrayList<Pair<Integer, Integer>>> adyacencias;
     private final ArrayList<Integer> posiblesMovActuales; //ArrayList auxiliar para almacenar los posibles movimientos que se realizaran.
 
     /**
@@ -51,13 +52,15 @@ public class M20A04a extends Mouse {
     /**
      * Constructor (Puedes modificar el nombre a tu gusto).
      */
-    public M20A04a() {
-        super("Break;");
+    public M20A04aDFS() {
+        super("BreakDFS;");
         celdasVisitadas = new HashMap<>();
         pilaMovimientos = new Stack<>();
         generador = new Random();
         posiblesCaminos = new HashMap<>();
         posiblesMovActuales = new ArrayList<>();
+        adyacencias = new HashMap<>();
+        adyacencias.put(new Pair<>(0, 0), new ArrayList<>());
     }
 
     /**
@@ -67,12 +70,12 @@ public class M20A04a extends Mouse {
      * @param cheese Queso
      */
     @Override
-    public int move(Grid currentGrid, Cheese cheese) {
+    public int move(final Grid currentGrid, final Cheese cheese) {
 
         return tomaDecision(currentGrid);
     }
 
-    public int tomaDecision(Grid currentGrid) {
+    public int tomaDecision(final Grid currentGrid) {
         posiblesMovActuales.clear();
         if (!stuck) {
             switch (movAnterior) {
@@ -129,9 +132,11 @@ public class M20A04a extends Mouse {
             movAnterior = posiblesMovActuales.get(generador.nextInt(posiblesMovActuales.size()));
             pilaMovimientos.push(currentGrid);
         }
-        debug();
-        posiblesCaminos.remove(new Pair(currentGrid.getX(), currentGrid.getY()));
+        //debug();
+        posiblesCaminos.remove(new Pair<>(currentGrid.getX(), currentGrid.getY()));
         addHashMap(currentGrid);
+        System.out.println("====================ADYACENCIAS=====================");
+        System.out.println(adyacencias);
         return movAnterior;
     }
 
@@ -142,11 +147,11 @@ public class M20A04a extends Mouse {
      * @param currentGrid Grid actual
      * @return Movimiento a tomar
      */
-    public int volverAnterior(Grid currentGrid) {
+    public int volverAnterior(final Grid currentGrid) {
 
-        if (posiblesCaminos.containsKey(new Pair(currentGrid.getX(), currentGrid.getY()))) {
+        if (posiblesCaminos.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY()))) {
             stuck = false;
-            posiblesCaminos.remove(new Pair(currentGrid.getX(), currentGrid.getY()));
+            posiblesCaminos.remove(new Pair<>(currentGrid.getX(), currentGrid.getY()));
             pilaMovimientos.push(currentGrid);
             if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
                 return UP;
@@ -191,27 +196,48 @@ public class M20A04a extends Mouse {
      * posibles caminos
      * @param currentGrid Grid en el que se encuentra el ratón actualmente
      */
-    public void addHashMap(Grid currentGrid) {
+    public void addHashMap(final Grid currentGrid) {
         int numCaminos = 0;
-        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY()))) {
-            celdasVisitadas.put(new Pair(currentGrid.getX(), currentGrid.getY()), currentGrid);
+        if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY()))) {
+            celdasVisitadas.put(new Pair<>(currentGrid.getX(), currentGrid.getY()), currentGrid);
+
             incExploredGrids();
         }
 
-        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY() - 1)) && currentGrid.canGoDown()) {
+        if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1)) && currentGrid.canGoDown()) {
             numCaminos++;
+
+            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1));
+
+            adyacencias.put(new Pair<Integer, Integer>(currentGrid.getX(), currentGrid.getY() - 1), new ArrayList<>());
+            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1)).add(new Pair<>(currentGrid.getX(), currentGrid.getY()));
         }
-        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY() + 1)) && currentGrid.canGoUp()) {
+        if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1)) && currentGrid.canGoUp()) {
             numCaminos++;
+
+            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1));
+
+            adyacencias.put(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1), new ArrayList<>());
+            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1)).add(new Pair<Integer, Integer>(currentGrid.getX(), currentGrid.getY()));
         }
-        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() - 1, currentGrid.getY())) && currentGrid.canGoLeft()) {
+        if (!celdasVisitadas.containsKey(new Pair<Integer, Integer>(currentGrid.getX() - 1, currentGrid.getY())) && currentGrid.canGoLeft()) {
             numCaminos++;
+
+            adyacencias.get(new Pair<Integer, Integer>(currentGrid.getX(), currentGrid.getY())).add(new Pair<Integer, Integer>(currentGrid.getX() - 1, currentGrid.getY()));
+
+            adyacencias.put(new Pair<Integer, Integer>(currentGrid.getX() - 1, currentGrid.getY()), new ArrayList<>());
+            adyacencias.get(new Pair<Integer, Integer>(currentGrid.getX() - 1, currentGrid.getY())).add(new Pair<Integer, Integer>(currentGrid.getX(), currentGrid.getY()));
         }
-        if (!celdasVisitadas.containsKey(new Pair(currentGrid.getX() + 1, currentGrid.getY())) && currentGrid.canGoRight()) {
+        if (!celdasVisitadas.containsKey(new Pair<Integer, Integer>(currentGrid.getX() + 1, currentGrid.getY())) && currentGrid.canGoRight()) {
             numCaminos++;
+
+            adyacencias.get(new Pair<Integer, Integer>(currentGrid.getX(), currentGrid.getY())).add(new Pair<Integer, Integer>(currentGrid.getX() + 1, currentGrid.getY()));
+
+            adyacencias.put(new Pair<Integer, Integer>(currentGrid.getX() + 1, currentGrid.getY()), new ArrayList<>());
+            adyacencias.get(new Pair<Integer, Integer>(currentGrid.getX() + 1, currentGrid.getY())).add(new Pair<Integer, Integer>(currentGrid.getX(), currentGrid.getY()));
         }
         if (numCaminos > 1) {
-            posiblesCaminos.put(new Pair(currentGrid.getX(), currentGrid.getY()), currentGrid);
+            posiblesCaminos.put(new Pair<Integer, Integer>(currentGrid.getX(), currentGrid.getY()), currentGrid);
         }
     }
 
@@ -237,7 +263,7 @@ public class M20A04a extends Mouse {
      * @param currentGrid Celda actual
      * @return True Si las casillas X e Y anterior son distintas a las actuales
      */
-    public boolean testGrid(int direction, Grid currentGrid) {
+    public boolean testGrid(final int direction, final Grid currentGrid) {
         if (lastGrid == null) {
             return true;
         }
@@ -276,7 +302,7 @@ public class M20A04a extends Mouse {
      * @return True Si la casilla vecina que indica la dirección había sido
      * visitada
      */
-    public boolean visitada(Grid casilla, int direccion) {
+    public boolean visitada(final Grid casilla, final int direccion) {
         int x = casilla.getX();
         int y = casilla.getY();
 
@@ -297,7 +323,7 @@ public class M20A04a extends Mouse {
                 x += 1;
                 break;
         }
-        Pair par = new Pair(x, y);
+        final Pair<Integer, Integer> par = new Pair<Integer, Integer>(x, y);
         return celdasVisitadas.containsKey(par);
     }
 
@@ -321,7 +347,7 @@ public class M20A04a extends Mouse {
      * @param anterior Celda anterior
      * @return True Si la posición Y de la actual es mayor que la de la anterior
      */
-    public boolean actualArriba(Grid actual, Grid anterior) {
+    public boolean actualArriba(final Grid actual, final Grid anterior) {
         return actual.getY() > anterior.getY();
     }
 
@@ -332,7 +358,7 @@ public class M20A04a extends Mouse {
      * @param anterior Celda anterior
      * @return True Si la posición Y de la actual es menor que la de la anterior
      */
-    public boolean actualAbajo(Grid actual, Grid anterior) {
+    public boolean actualAbajo(final Grid actual, final Grid anterior) {
         return actual.getY() < anterior.getY();
     }
 
@@ -343,7 +369,7 @@ public class M20A04a extends Mouse {
      * @param anterior Celda anterior
      * @return True Si la posición X de la actual es mayor que la de la anterior
      */
-    public boolean actualDerecha(Grid actual, Grid anterior) {
+    public boolean actualDerecha(final Grid actual, final Grid anterior) {
         return actual.getX() > anterior.getX();
     }
 
@@ -354,7 +380,7 @@ public class M20A04a extends Mouse {
      * @param anterior Celda anterior
      * @return True Si la posición X de la actual es menor que la de la anterior
      */
-    public boolean actualIzquierda(Grid actual, Grid anterior) {
+    public boolean actualIzquierda(final Grid actual, final Grid anterior) {
         return actual.getX() < anterior.getX();
     }
 
