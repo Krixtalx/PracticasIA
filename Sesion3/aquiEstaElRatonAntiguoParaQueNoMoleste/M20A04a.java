@@ -129,7 +129,7 @@ public class M20A04a extends Mouse {
             movAnterior = posiblesMovActuales.get(generador.nextInt(posiblesMovActuales.size()));
             pilaMovimientos.push(currentGrid);
         }
-        debug();
+        //debug();
         posiblesCaminos.remove(new Pair(currentGrid.getX(), currentGrid.getY()));
         addHashMap(currentGrid);
         return movAnterior;
