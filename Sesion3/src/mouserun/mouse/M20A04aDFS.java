@@ -37,7 +37,6 @@ public class M20A04aDFS extends Mouse {
 	 */
 	private boolean stuck = false;
 
-
 	/**
 	 * Tabla hash para almacenar las celdas visitadas por el raton:
 	 * Clave:Coordenadas Valor: La celda
@@ -54,6 +53,8 @@ public class M20A04aDFS extends Mouse {
 	private final Stack<Grid> pilaMovimientos;
 
 	private final Stack<Grid> pilaDFS; //Almacena los movimiento realizados en la búsqueda
+	private int contador = 0; //Contador para borrar la pila de movimientos
+	private boolean revertir = false;
 
 	/**
 	 * Constructor (Puedes modificar el nombre a tu gusto).
@@ -81,17 +82,76 @@ public class M20A04aDFS extends Mouse {
 	public int move(final Grid currentGrid, final Cheese cheese) {
 
 		Pair posicionQueso = new Pair(cheese.getX(), cheese.getY());
-
+		System.out.println("CONTADOR: " + contador);
+		while(revertir && !celdasVisitadas.containsKey(posicionQueso)){
+			if(contador > 0){
+				contador--;
+				return relativa(currentGrid, pilaMovimientos.pop());
+			}else{
+				revertir = false;
+			}
+		}
 		if (celdasVisitadas.containsKey(posicionQueso)) {
-			int corre = recorreDFS(currentGrid/*, new Grid(cheese.getX(), cheese.getY())*/);
-			System.out.println("CORRIENDO A: " + corre);
+			int corre = recorreDFSMAL(currentGrid, new Grid(cheese.getX(), cheese.getY()));
+			//System.out.println("CORRIENDO A: " + corre);
 			return corre;
 		} else {
-			System.out.println("EXPLORA");
+			//System.out.println("EXPLORA");
 			return tomaDecision(currentGrid);
 		}
 	}
 
+	//TODO: falta optimizar o cambiar cosas. Si toca una bomba es F masiva
+	public int recorreDFSMAL(Grid currentGrid, Grid destino) {
+		visitadasDFS.add(new Pair(currentGrid.getX(), currentGrid.getY()));
+		ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(new Pair(currentGrid.getX(), currentGrid.getY()));
+//		System.out.println("ADYACENTES: " + lista);
+//		System.out.println("PILA: " + pilaDFS);
+//		System.out.println("VISITADAS: " + visitadasDFS);
+		Iterator<Pair<Integer, Integer>> it = lista.listIterator();
+		Pair<Integer, Integer> evaluando;
+		Grid siguiente = null;
+		int menorDistancia = Integer.MAX_VALUE;
+		boolean sigue = true;
+		while (it.hasNext()) {
+			evaluando = it.next();
+			if (celdasVisitadas.containsKey(evaluando) && !visitadasDFS.contains(evaluando)) {
+				int dist = distancia(new Grid(evaluando.getKey(), evaluando.getValue()), destino);
+//				System.out.println("DISTANCIA: " + dist);
+				if (dist <= menorDistancia) {
+					menorDistancia = dist;
+					siguiente = new Grid(evaluando.getKey(), evaluando.getValue());
+				}
+				sigue = false;
+			}
+		}
+		if (siguiente == null) {
+//			System.out.println("=====ATRAS=====");
+			//int mov = relativa(currentGrid, pilaDFS.pop());
+			int mov = relativa(currentGrid, pilaMovimientos.pop());
+			contador--;
+			return mov;
+//			System.out.println("F");
+//			return BOMB;
+		}
+		if (!sigue) {
+			//System.out.println("=====BUENA=====");
+			//pilaDFS.add(currentGrid);
+			pilaMovimientos.add(currentGrid);
+			contador++;
+			return relativa(currentGrid, siguiente);
+		} else {
+			//System.out.println("=====MALA=====");
+			//int mov = relativa(currentGrid, pilaDFS.pop());
+			int mov = relativa(currentGrid, pilaMovimientos.pop());
+			return mov;
+		}
+	}
+
+	public int distancia(Grid a, Grid b){
+		return Math.abs(a.getX()-b.getX()) + Math.abs(a.getY()-b.getY());
+	}
+	
 	public int recorreDFS(Grid currentGrid) {
 		visitadasDFS.add(new Pair(currentGrid.getX(), currentGrid.getY()));
 		ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(new Pair(currentGrid.getX(), currentGrid.getY()));
@@ -112,12 +172,12 @@ public class M20A04aDFS extends Mouse {
 			return BOMB;
 		}
 		if (!sigue) {
-			System.out.println("=====BUENA=====");
+			//System.out.println("=====BUENA=====");
 			//pilaDFS.add(currentGrid);
 			pilaMovimientos.add(currentGrid);
 			return relativa(currentGrid, new Grid(evaluando.getKey(), evaluando.getValue()));
 		} else {
-			System.out.println("=====MALA=====");
+			//System.out.println("=====MALA=====");
 			//int mov = relativa(currentGrid, pilaDFS.pop());
 			int mov = relativa(currentGrid, pilaMovimientos.pop());
 			return mov;
@@ -313,6 +373,7 @@ public class M20A04aDFS extends Mouse {
 	public void newCheese() {
 		pilaDFS.clear();
 		visitadasDFS.clear();
+		revertir = true;
 	}
 
 	/**
