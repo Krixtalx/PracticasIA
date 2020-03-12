@@ -63,7 +63,7 @@ public class M20A04aDFS extends Mouse {
 	
 	//COSA DE DFS2.0
 	private boolean hayDFS = false;
-	private final LinkedList<Integer> caminoDFS;
+	private final Stack<Integer> caminoDFS;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//                                   MÉTODOS PRINCIPALES
@@ -82,7 +82,7 @@ public class M20A04aDFS extends Mouse {
 		adyacencias.put(new Pair<>(0, 0), new ArrayList<>());
 		pilaDFS = new Stack<>();
 		visitadasDFS = new HashSet<>();
-		caminoDFS = new LinkedList();
+		caminoDFS = new Stack();
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -111,15 +111,18 @@ public class M20A04aDFS extends Mouse {
 			//return corre;
 			if(hayDFS){
 				System.out.println("SACANDO: " + caminoDFS.peek());
-				return caminoDFS.pollFirst();
+				return caminoDFS.pop();
 			}else{
 				System.out.println("GENERANDO DFS");
-				recorreDFS(currentGrid, new Grid(cheese.getX(), cheese.getY()));
+				recorreDFS(new Grid(cheese.getX(), cheese.getY()), currentGrid);
 				return BOMB;
 			}
 			//TODO: backtracking para que no muera
 		} else {
 			//System.out.println("EXPLORA");
+			if(!posiblesCaminos.isEmpty()){
+				
+			}
 			return tomaDecision(currentGrid);
 		}
 	}
@@ -188,7 +191,9 @@ public class M20A04aDFS extends Mouse {
 		Grid actual = new Grid(posicion.getX(), posicion.getY());
 		while (!mismaPosicion(actual, destino)) {
 			System.out.println("ACTUAL: " + actual.getX() + "-" + actual.getY());
+//			System.out.println("DESTINO: " + destino.getX() + "-" + destino.getY());
 			System.out.println("CAMINO: " + caminoDFS);
+//			System.out.println("VISITADAS: " + visitadasDFS);
 			Pair<Integer, Integer> evaluando = new Pair(actual.getX(), actual.getY());
 			visitadasDFS.add(evaluando);
 			ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(evaluando);
@@ -196,18 +201,23 @@ public class M20A04aDFS extends Mouse {
 			boolean sigue = true;
 			while (it.hasNext() && sigue) {
 				evaluando = it.next();
+				if(mismaPosicion(new Grid(evaluando.getKey(), evaluando.getValue()), destino)){
+					System.out.println("PORQUE NO FUNCIONO");
+					System.out.println("VISITADA: " + celdasVisitadas.containsKey(evaluando));
+					System.out.println("EN DFS: " + visitadasDFS.contains(evaluando));
+				}
 				if (celdasVisitadas.containsKey(evaluando) && !visitadasDFS.contains(evaluando)) {
 					sigue = false;
 				}
 			}
 			if (sigue) {
-				int mov = caminoDFS.pollLast();
-				mov = contrario(mov);
-				System.out.println("CONTRARIO: " + mov);
+				int mov = caminoDFS.pop();
+				//mov = contrario(mov);
+				//System.out.println("CONTRARIO: " + mov);
 				actual = getCelda(actual, mov);
 			} else {
 				Grid temp = new Grid(evaluando.getKey(), evaluando.getValue());
-				caminoDFS.add(relativa(actual, temp));
+				caminoDFS.add(relativa(temp, actual));
 				actual = temp;
 			}
 		}
