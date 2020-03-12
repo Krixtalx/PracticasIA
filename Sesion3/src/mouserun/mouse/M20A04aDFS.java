@@ -23,7 +23,6 @@ public class M20A04aDFS extends Mouse {
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // ATRIBUTOS
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
     Random generador;
 
     /**
@@ -42,15 +41,16 @@ public class M20A04aDFS extends Mouse {
      * Clave:Coordenadas Valor: La celda
      */
     private final HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
-    private final HashMap<Pair<Integer, Integer>, Grid> posiblesCaminos; // Almacena las celdas que contienen
-                                                                         // bifurcaciones no visitadas.
+    // private final HashMap<Pair<Integer, Integer>, Grid> posiblesCaminos;
+    private final ArrayList<Grid> posiblesCaminos; // Almacena las celdas que contienen
+    // bifurcaciones no visitadas.
     private final HashMap<Pair<Integer, Integer>, ArrayList<Pair<Integer, Integer>>> adyacencias; // Almacena las
-                                                                                                  // adyacencias de las
-                                                                                                  // celdas visitadas.
+    // adyacencias de las
+    // celdas visitadas.
     private final HashSet<Pair<Integer, Integer>> visitadasDFS; // Almacena las posiciones visitadas en la ultima
-                                                                // búsqueda.
+    // búsqueda.
     private final ArrayList<Integer> posiblesMovActuales; // ArrayList auxiliar para almacenar los posibles movimientos
-                                                          // que se realizaran.
+    // que se realizaran.
 
     /**
      * Pila para almacenar el camino recorrido.
@@ -62,8 +62,10 @@ public class M20A04aDFS extends Mouse {
     private boolean revertir = false;
 
     // COSA DE DFS2.0
+    private boolean evaluado = false;
     private boolean hayDFS = false;
     private final Stack<Integer> caminoDFS;
+    private Grid objetivo;
 
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // MÉTODOS PRINCIPALES
@@ -76,7 +78,7 @@ public class M20A04aDFS extends Mouse {
         celdasVisitadas = new HashMap<>();
         pilaMovimientos = new Stack<>();
         generador = new Random();
-        posiblesCaminos = new HashMap<>();
+        posiblesCaminos = new ArrayList<>();
         posiblesMovActuales = new ArrayList<>();
         adyacencias = new HashMap<>();
         adyacencias.put(new Pair<>(0, 0), new ArrayList<>());
@@ -92,138 +94,79 @@ public class M20A04aDFS extends Mouse {
      * @param currentGrid Celda actual
      * @param cheese      Queso
      */
+    // TODO: si no sabe donde esta el queso, seguir explorando
+    // si puede seguir explorando el camino, sigue
+    // si no, dfs a la ultima bifurcacion
+    // TODO: si sabe donde esta, hacer DFS
     @Override
     public int move(final Grid currentGrid, final Cheese cheese) {
 
-        Pair<Integer, Integer> posicionQueso = new Pair<>(cheese.getX(), cheese.getY());
-        // System.out.println("CONTADOR: " + contador);
-        while (revertir && !celdasVisitadas.containsKey(posicionQueso)) {
-            if (contador > 0) {
-                contador--;
-                return relativa(currentGrid, pilaMovimientos.pop());
-            } else {
-                revertir = false;
+        Pair<Integer, Integer> queso = new Pair<>(cheese.getX(), cheese.getY());
+        System.out.println("BUENA1");
+        if (objetivo != null) {
+            // System.out.println("YA CASI NO HAY DFS");
+            if (mismaPosicion(currentGrid, objetivo)) {
+                hayDFS = false;
+                stuck = false;
+                objetivo = null;
             }
         }
-        if (celdasVisitadas.containsKey(posicionQueso)) {
-            // int corre = recorreDFSMAL(currentGrid, new Grid(cheese.getX(),
-            // cheese.getY()));
-            // System.out.println("CORRIENDO A: " + corre);
-            // return corre;
-            if (hayDFS) {
-                // System.out.println("SACANDO: " + caminoDFS.peek());
-                return caminoDFS.pop();
-            } else {
-                if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY()))) {
-                    celdasVisitadas.put(new Pair<>(currentGrid.getX(), currentGrid.getY()), currentGrid);
-                }
-                System.out.println("GENERANDO DFS");
-                recorreDFS(new Grid(cheese.getX(), cheese.getY()), currentGrid);
-                return BOMB;
-            }
-            // TODO: backtracking para que no muera
-        } else {
-            // System.out.println("EXPLORA");
-            if (!posiblesCaminos.isEmpty()) {
-                if(hayDFS){
 
-                }else{
-                    ArrayList<Grid> pendientes = celdasVisitadas.values();
-                }
-            }
+        System.out.println("BUENA2");
+        if (hayDFS && !caminoDFS.empty()) {
+            System.out.println("CAMINO: " + caminoDFS);
+            System.out.println("YENDO A: " + caminoDFS.peek());
+            return caminoDFS.pop();
+        } else if (!evaluado && celdasVisitadas.containsKey(queso)) {
+            System.out.println("BUENA3");
+            evaluado = true;
+            Grid destino = new Grid(cheese.getX(), cheese.getY());
+            addHashMap(currentGrid);
+            recorreDFS(destino, currentGrid);
+            return caminoDFS.pop();
+        } else {
+            System.out.println("BUENA4");
             return tomaDecision(currentGrid);
         }
     }
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // TODO: falta optimizar o cambiar cosas. Si toca una bomba es F masiva
-    /**
-     *
-     * @param currentGrid
-     * @param destino
-     * @return
-     */
-    public int recorreDFSMAL(Grid currentGrid, Grid destino) {
-        visitadasDFS.add(new Pair<>(currentGrid.getX(), currentGrid.getY()));
-        ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY()));
-        // System.out.println("ADYACENTES: " + lista);
-        // System.out.println("PILA: " + pilaDFS);
-        // System.out.println("VISITADAS: " + visitadasDFS);
-        Iterator<Pair<Integer, Integer>> it = lista.listIterator();
-        Pair<Integer, Integer> evaluando;
-        Grid siguiente = null;
-        int menorDistancia = Integer.MAX_VALUE;
-        boolean sigue = true;
-        while (it.hasNext()) {
-            evaluando = it.next();
-            if (celdasVisitadas.containsKey(evaluando) && !visitadasDFS.contains(evaluando)) {
-                int dist = distancia(new Grid(evaluando.getKey(), evaluando.getValue()), destino);
-                // System.out.println("DISTANCIA: " + dist);
-                if (dist <= menorDistancia) {
-                    menorDistancia = dist;
-                    siguiente = new Grid(evaluando.getKey(), evaluando.getValue());
-                }
-                sigue = false;
-            }
-        }
-        if (siguiente == null) {
-            // System.out.println("=====ATRAS=====");
-            // int mov = relativa(currentGrid, pilaDFS.pop());
-            int mov = relativa(currentGrid, pilaMovimientos.pop());
-            contador--;
-            return mov;
-            // System.out.println("F");
-            // return BOMB;
-        }
-        if (!sigue) {
-            // System.out.println("=====BUENA=====");
-            // pilaDFS.add(currentGrid);
-            pilaMovimientos.add(currentGrid);
-            contador++;
-            return relativa(currentGrid, siguiente);
-        } else {
-            // System.out.println("=====MALA=====");
-            // int mov = relativa(currentGrid, pilaDFS.pop());
-            int mov = relativa(currentGrid, pilaMovimientos.pop());
-            return mov;
-        }
+    // Esto sera la version buena donde poner lo que funcione, la otra de prueba
+    public int move2(final Grid currentGrid, final Cheese cheese) {
+        return UP;
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
      * Traza una ruta desde la posición actual hasta la posición destino
+     *
      * @param posicion Posicion en la que se encuentra el ratón
-     * @param destino Posicion a la que quiere ir el ratón
+     * @param destino  Posicion a la que quiere ir el ratón
      */
     public void recorreDFS(Grid posicion, Grid destino) {
         Grid actual = new Grid(posicion.getX(), posicion.getY());
+        // Itera mientras no llegue al destino
         while (!mismaPosicion(actual, destino)) {
-            // System.out.println("ACTUAL: " + actual.getX() + "-" + actual.getY());
-            // System.out.println("DESTINO: " + destino.getX() + "-" + destino.getY());
-            // System.out.println("CAMINO: " + caminoDFS);
-            // System.out.println("VISITADAS: " + visitadasDFS);
+
+            // Añade a las visitadas la actual
             Pair<Integer, Integer> evaluando = new Pair<>(actual.getX(), actual.getY());
             visitadasDFS.add(evaluando);
+
+            // Obtiene las adyacencias de la actual
             ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(evaluando);
             Iterator<Pair<Integer, Integer>> it = lista.listIterator();
             boolean sigue = true;
+            // Busca una adyacencia válida
             while (it.hasNext() && sigue) {
                 evaluando = it.next();
-                /*
-                 * if(mismaPosicion(new Grid(evaluando.getKey(), evaluando.getValue()),
-                 * destino)){ System.out.println("PORQUE NO FUNCIONO");
-                 * System.out.println("EVALUANDO: " + evaluando);
-                 * System.out.println("VISITADA: " + celdasVisitadas.containsKey(evaluando));
-                 * System.out.println("EN DFS: " + visitadasDFS.contains(evaluando)); }
-                 */
                 if (celdasVisitadas.containsKey(evaluando) && !visitadasDFS.contains(evaluando)) {
                     sigue = false;
                 }
             }
+
+            // Si la hay, sigue el DFS
+            // si no, vuelve atrás
             if (sigue) {
                 int mov = caminoDFS.pop();
-                // mov = contrario(mov);
-                // System.out.println("CONTRARIO: " + mov);
                 actual = getCelda(actual, mov);
             } else {
                 Grid temp = new Grid(evaluando.getKey(), evaluando.getValue());
@@ -232,6 +175,7 @@ public class M20A04aDFS extends Mouse {
             }
         }
         System.out.println("DFS TERMINADO");
+        // System.out.println("CAMINO: " + caminoDFS);
         hayDFS = true;
     }
 
@@ -244,6 +188,7 @@ public class M20A04aDFS extends Mouse {
     public int tomaDecision(final Grid currentGrid) {
         posiblesMovActuales.clear();
         if (!stuck) {
+            // Intenga seguir el camino en la misma direccion
             switch (movAnterior) {
                 case UP:
                     if (currentGrid.canGoUp() && !currentGrid.canGoRight() && !currentGrid.canGoLeft()
@@ -281,6 +226,7 @@ public class M20A04aDFS extends Mouse {
                     break;
             }
 
+            // Obtiene las celdas a las que puede acceder desde la posición actual
             if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
                 posiblesMovActuales.add(UP);
             }
@@ -295,15 +241,19 @@ public class M20A04aDFS extends Mouse {
             }
         }
 
+        // Si está vacía, vuelve atrás
+        // si no, avanza en una dirección aleatoria
         if (posiblesMovActuales.isEmpty()) {
             stuck = true;
+            // System.out.println("COSA MALA DE VOLVER ATRAS");
+            addHashMap(currentGrid);
             movAnterior = volverAnterior(currentGrid);
+            // System.out.println("Camino: " + caminoDFS);
         } else {
             movAnterior = posiblesMovActuales.get(generador.nextInt(posiblesMovActuales.size()));
             pilaMovimientos.push(currentGrid);
+            addHashMap(currentGrid);
         }
-        posiblesCaminos.remove(new Pair<>(currentGrid.getX(), currentGrid.getY()));
-        addHashMap(currentGrid);
 
         return movAnterior;
     }
@@ -317,46 +267,10 @@ public class M20A04aDFS extends Mouse {
      * @return Movimiento a tomar
      */
     public int volverAnterior(final Grid currentGrid) {
-
-        if (posiblesCaminos.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY()))) {
-            stuck = false;
-            posiblesCaminos.remove(new Pair<>(currentGrid.getX(), currentGrid.getY()));
-            pilaMovimientos.push(currentGrid);
-            if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
-                return UP;
-            }
-            if (currentGrid.canGoDown() && !visitada(currentGrid, DOWN)) {
-                return DOWN;
-            }
-            if (currentGrid.canGoLeft() && !visitada(currentGrid, LEFT)) {
-                return LEFT;
-            }
-            if (currentGrid.canGoRight() && !visitada(currentGrid, RIGHT)) {
-                return RIGHT;
-            }
-        }
-        while (!pilaMovimientos.isEmpty()) {
-            if (actualAbajo(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return UP;
-            }
-            if (actualArriba(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return DOWN;
-            }
-            if (actualDerecha(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return LEFT;
-            }
-            if (actualIzquierda(currentGrid, pilaMovimientos.lastElement())) {
-                pilaMovimientos.pop();
-                return RIGHT;
-            }
-            pilaMovimientos.pop();
-            corrupta++;
-        }
-
-        stuck = false;
+        System.out.println("BUENA5");
+        objetivo = posiblesCaminos.remove(posiblesCaminos.size() - 1);
+        // System.out.println("Objetivo: " + objetivo.getX() + "." + objetivo.getY());
+        recorreDFS(objetivo, currentGrid);
         return BOMB;
     }
 
@@ -368,12 +282,13 @@ public class M20A04aDFS extends Mouse {
      */
     public void addHashMap(final Grid currentGrid) {
         int numCaminos = 0;
+        // Añade la celda actual al mapa
         if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY()))) {
             celdasVisitadas.put(new Pair<>(currentGrid.getX(), currentGrid.getY()), currentGrid);
-
             incExploredGrids();
         }
 
+        // Actualiza adyacencias de la celda actual y sus vecinas
         if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1))
                 && currentGrid.canGoDown()) {
             numCaminos++;
@@ -418,8 +333,10 @@ public class M20A04aDFS extends Mouse {
             adyacencias.get(new Pair<>(currentGrid.getX() + 1, currentGrid.getY()))
                     .add(new Pair<>(currentGrid.getX(), currentGrid.getY()));
         }
+
+        // Si puede ir por varios sitios, se guarda para volver más tarde
         if (numCaminos > 1) {
-            posiblesCaminos.put(new Pair<>(currentGrid.getX(), currentGrid.getY()), currentGrid);
+            posiblesCaminos.add(currentGrid);
         }
     }
 
@@ -431,9 +348,11 @@ public class M20A04aDFS extends Mouse {
     public void newCheese() {
         pilaDFS.clear();
         visitadasDFS.clear();
+        caminoDFS.clear();
         revertir = true;
         hayDFS = false;
-        caminoDFS.clear();
+        evaluado = false;
+        stuck = false;
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -446,6 +365,7 @@ public class M20A04aDFS extends Mouse {
         visitadasDFS.clear();
         caminoDFS.clear();
         pilaMovimientos.clear();
+        stuck = true;
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -603,7 +523,7 @@ public class M20A04aDFS extends Mouse {
 
     /**
      * Devuelve el movimiento contrario
-     * 
+     *
      * @param movimiento
      * @return movimientoContrario a movimiento
      */
