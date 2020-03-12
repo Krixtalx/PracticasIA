@@ -110,9 +110,12 @@ public class M20A04aDFS extends Mouse {
 			//System.out.println("CORRIENDO A: " + corre);
 			//return corre;
 			if(hayDFS){
-				System.out.println("SACANDO: " + caminoDFS.peek());
+				//System.out.println("SACANDO: " + caminoDFS.peek());
 				return caminoDFS.pop();
 			}else{
+				if(!celdasVisitadas.containsKey(new Pair(currentGrid.getX(), currentGrid.getY()))){
+					celdasVisitadas.put(new Pair(currentGrid.getX(), currentGrid.getY()), currentGrid);
+				}
 				System.out.println("GENERANDO DFS");
 				recorreDFS(new Grid(cheese.getX(), cheese.getY()), currentGrid);
 				return BOMB;
@@ -190,9 +193,9 @@ public class M20A04aDFS extends Mouse {
 	public void recorreDFS(Grid posicion, Grid destino) {
 		Grid actual = new Grid(posicion.getX(), posicion.getY());
 		while (!mismaPosicion(actual, destino)) {
-			System.out.println("ACTUAL: " + actual.getX() + "-" + actual.getY());
+//			System.out.println("ACTUAL: " + actual.getX() + "-" + actual.getY());
 //			System.out.println("DESTINO: " + destino.getX() + "-" + destino.getY());
-			System.out.println("CAMINO: " + caminoDFS);
+//			System.out.println("CAMINO: " + caminoDFS);
 //			System.out.println("VISITADAS: " + visitadasDFS);
 			Pair<Integer, Integer> evaluando = new Pair(actual.getX(), actual.getY());
 			visitadasDFS.add(evaluando);
@@ -201,11 +204,12 @@ public class M20A04aDFS extends Mouse {
 			boolean sigue = true;
 			while (it.hasNext() && sigue) {
 				evaluando = it.next();
-				if(mismaPosicion(new Grid(evaluando.getKey(), evaluando.getValue()), destino)){
+				/*if(mismaPosicion(new Grid(evaluando.getKey(), evaluando.getValue()), destino)){
 					System.out.println("PORQUE NO FUNCIONO");
+					System.out.println("EVALUANDO: " + evaluando);
 					System.out.println("VISITADA: " + celdasVisitadas.containsKey(evaluando));
 					System.out.println("EN DFS: " + visitadasDFS.contains(evaluando));
-				}
+				}*/
 				if (celdasVisitadas.containsKey(evaluando) && !visitadasDFS.contains(evaluando)) {
 					sigue = false;
 				}
