@@ -65,6 +65,7 @@ public class M20A04aGRE extends Mouse {
 	//COSA DE DFS2.0
 	private boolean hayDFS = false;
 	private final LinkedList<Integer> caminoDFS;
+	private boolean probar = false;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//                                   MÉTODOS PRINCIPALES
@@ -98,11 +99,11 @@ public class M20A04aGRE extends Mouse {
 
 		Pair posicionQueso = new Pair(cheese.getX(), cheese.getY());
 
-			System.out.println("POSIBLES: ");
-			for (int i = 0; i < posiblesCaminos.size(); i++) {
-				System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
-			}
-			System.out.println("");
+		/*System.out.println("POSIBLES: ");
+		for (int i = 0; i < posiblesCaminos.size(); i++) {
+			System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
+		}
+		System.out.println("");*/
 		//System.out.println("CONTADOR: " + contador);
 		while (revertir/* && !celdasVisitadas.containsKey(posicionQueso)*/) {
 			if (contador > 0) {
@@ -111,7 +112,7 @@ public class M20A04aGRE extends Mouse {
 			} else {
 				revertir = false;
 			}
-		}/*
+		}
 		if (celdasVisitadas.containsKey(posicionQueso)) {
 			//int corre = recorreDFSMAL(currentGrid, new Grid(cheese.getX(), cheese.getY()));
 			//System.out.println("CORRIENDO A: " + corre);
@@ -132,8 +133,8 @@ public class M20A04aGRE extends Mouse {
 		} else {
 			//System.out.println("EXPLORA");
 			return tomaDecision(currentGrid);
-		}*/
-			return tomaDecision(currentGrid);
+		}
+		//return tomaDecision(currentGrid);
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -145,6 +146,7 @@ public class M20A04aGRE extends Mouse {
 	public void recorreDFS(Grid posicion, Grid destino) {
 		Grid actual = new Grid(posicion.getX(), posicion.getY());
 		while (!mismaPosicion(actual, destino)) {
+//			System.out.println("MUERTO");
 //			System.out.println("ACTUAL: " + actual.getX() + "-" + actual.getY());
 //			System.out.println("CAMINO: " + caminoDFS);
 			Pair<Integer, Integer> evaluando = new Pair(actual.getX(), actual.getY());
@@ -254,12 +256,30 @@ public class M20A04aGRE extends Mouse {
 	 * @return Movimiento a tomar
 	 */
 	public int volverAnterior(final Grid currentGrid) {
-
-		System.out.println("TAMA: " + posiblesCaminos.size());
-		int cosa = posiblesCaminos.size()-1;
-		if (posiblesCaminos.get(cosa) == currentGrid) {
+		for (int i = 0; i < posiblesCaminos.size(); i++) {
+			if (posiblesCaminos.get(i) == currentGrid) {
+				int numCaminos = 0;
+				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1)) && currentGrid.canGoDown()) {
+					numCaminos++;
+				}
+				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1)) && currentGrid.canGoUp()) {
+					numCaminos++;
+				}
+				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX() - 1, currentGrid.getY())) && currentGrid.canGoLeft()) {
+					numCaminos++;
+				}
+				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX() + 1, currentGrid.getY())) && currentGrid.canGoRight()) {
+					numCaminos++;
+				}
+				if (numCaminos == 0) {
+					posiblesCaminos.remove(i);
+				}
+			}
+		}
+		int cosa = posiblesCaminos.size() - 1;
+		if (posiblesCaminos.get(cosa) == currentGrid && cosa >= 0) {
 			stuck = false;
-			posiblesCaminos.remove(posiblesCaminos.size());
+			posiblesCaminos.remove(cosa);
 			pilaMovimientos.push(currentGrid);
 			if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
 				return UP;
@@ -296,6 +316,13 @@ public class M20A04aGRE extends Mouse {
 		}
 
 		stuck = false;
+//		System.out.println("PREMUERTE: " + posiblesCaminos);
+		System.out.println("POSIBLES: ");
+		for (int i = 0; i < posiblesCaminos.size(); i++) {
+			System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
+		}
+		System.out.println("");
+		System.out.println("SI MUERO AQUI ESTAMOS JODIDOS");
 		return BOMB;
 	}
 
@@ -553,6 +580,7 @@ public class M20A04aGRE extends Mouse {
 			case LEFT:
 				return RIGHT;
 			default:
+				System.out.println("HE MUERTO EN EL CONTRARIO");
 				return BOMB;
 		}
 	}
@@ -569,8 +597,8 @@ public class M20A04aGRE extends Mouse {
 				return new Grid(actual.getX() + 1, actual.getY());
 		}
 	}
-	
-	public Pair<Integer, Integer> getPosicion(Grid celda){
+
+	public Pair<Integer, Integer> getPosicion(Grid celda) {
 		return new Pair(celda.getX(), celda.getY());
 	}
 }
