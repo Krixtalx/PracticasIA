@@ -65,7 +65,7 @@ public class M20A04aGRE extends Mouse {
 	//COSA DE DFS2.0
 	private boolean hayDFS = false;
 	private final LinkedList<Integer> caminoDFS;
-	private boolean probar = false;
+	private boolean quesoNoVisitado = false;
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//                                   MÉTODOS PRINCIPALES
@@ -99,21 +99,35 @@ public class M20A04aGRE extends Mouse {
 
 		Pair posicionQueso = new Pair(cheese.getX(), cheese.getY());
 
-		/*System.out.println("POSIBLES: ");
+		System.out.println("POSIBLES: ");
 		for (int i = 0; i < posiblesCaminos.size(); i++) {
 			System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
 		}
-		System.out.println("");*/
-		//System.out.println("CONTADOR: " + contador);
-		while (revertir/* && !celdasVisitadas.containsKey(posicionQueso)*/) {
-			if (contador > 0) {
-				contador--;
-				return relativa(currentGrid, pilaMovimientos.pop());
-			} else {
-				revertir = false;
+		System.out.println("");
+//		System.out.println("CONTADOR: " + contador);
+//		while (revertir/* && !celdasVisitadas.containsKey(posicionQueso)*/) {
+//			System.out.println("QUE HASE ILLO");
+//			if (contador > 0) {
+//				contador--;
+//				return relativa(currentGrid, pilaMovimientos.pop());
+//			} else {
+//				revertir = false;
+//			}
+//		}
+		if (quesoNoVisitado) {
+//			System.out.println("NO VISITADO: " + caminoDFS.size());
+			if (caminoDFS.size() == 1) {
+				quesoNoVisitado = false;
 			}
+
+			return caminoDFS.pollFirst();
+
 		}
+
 		if (celdasVisitadas.containsKey(posicionQueso)) {
+			if(!actualizaPendientes(currentGrid)){
+				posiblesCaminos.add(currentGrid);
+			}
 			//int corre = recorreDFSMAL(currentGrid, new Grid(cheese.getX(), cheese.getY()));
 			//System.out.println("CORRIENDO A: " + corre);
 			//return corre;
@@ -129,12 +143,11 @@ public class M20A04aGRE extends Mouse {
 				recorreDFS(currentGrid, new Grid(cheese.getX(), cheese.getY()));
 				return caminoDFS.pollFirst();
 			}
-			//TODO: backtracking para que no muera
 		} else {
 			//System.out.println("EXPLORA");
 			return tomaDecision(currentGrid);
 		}
-		//return tomaDecision(currentGrid);
+//		return tomaDecision(currentGrid);
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -233,6 +246,8 @@ public class M20A04aGRE extends Mouse {
 			}
 		}
 
+		addHashMap(currentGrid);
+		//System.out.println("EXPLORADAS: " + celdasVisitadas.size());
 		if (posiblesMovActuales.isEmpty()) {
 			stuck = true;
 			movAnterior = volverAnterior(currentGrid);
@@ -241,9 +256,36 @@ public class M20A04aGRE extends Mouse {
 			pilaMovimientos.push(currentGrid);
 		}
 		//debug();
-		addHashMap(currentGrid);
+
 //		System.out.println("====================ADYACENCIAS=====================");
 //		System.out.println(adyacencias);
+		for (int i = 0; i < posiblesCaminos.size(); i++) {
+			if (mismaPosicion(posiblesCaminos.get(i), currentGrid)) {
+				if(actualizaPendientes(currentGrid)){
+					posiblesCaminos.remove(i);
+				}
+			}
+			if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX(), currentGrid.getY() + 1))) {
+				if(actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX(), currentGrid.getY() + 1)))){
+					posiblesCaminos.remove(i);
+				}
+			}
+			if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX(), currentGrid.getY() - 1))) {
+				if(actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX(), currentGrid.getY() - 1)))){
+					posiblesCaminos.remove(i);
+				}
+			}
+			if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX() - 1, currentGrid.getY()))) {
+				if(actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX() - 1, currentGrid.getY())))){
+					posiblesCaminos.remove(i);
+				}
+			}
+			if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX() + 1, currentGrid.getY()))) {
+				if(actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX() + 1, currentGrid.getY())))){
+					posiblesCaminos.remove(i);
+				}
+			}
+		}
 		return movAnterior;
 	}
 
@@ -256,26 +298,6 @@ public class M20A04aGRE extends Mouse {
 	 * @return Movimiento a tomar
 	 */
 	public int volverAnterior(final Grid currentGrid) {
-		for (int i = 0; i < posiblesCaminos.size(); i++) {
-			if (posiblesCaminos.get(i) == currentGrid) {
-				int numCaminos = 0;
-				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1)) && currentGrid.canGoDown()) {
-					numCaminos++;
-				}
-				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1)) && currentGrid.canGoUp()) {
-					numCaminos++;
-				}
-				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX() - 1, currentGrid.getY())) && currentGrid.canGoLeft()) {
-					numCaminos++;
-				}
-				if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX() + 1, currentGrid.getY())) && currentGrid.canGoRight()) {
-					numCaminos++;
-				}
-				if (numCaminos == 0) {
-					posiblesCaminos.remove(i);
-				}
-			}
-		}
 		int cosa = posiblesCaminos.size() - 1;
 		if (posiblesCaminos.get(cosa) == currentGrid && cosa >= 0) {
 			stuck = false;
@@ -317,12 +339,23 @@ public class M20A04aGRE extends Mouse {
 
 		stuck = false;
 //		System.out.println("PREMUERTE: " + posiblesCaminos);
-		System.out.println("POSIBLES: ");
-		for (int i = 0; i < posiblesCaminos.size(); i++) {
-			System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
+//		System.out.println("POSIBLES: ");
+//		for (int i = 0; i < posiblesCaminos.size(); i++) {
+//			System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
+//		}
+//		System.out.println("");
+//		System.out.println("SI MUERO AQUI ESTAMOS JODIDOS");
+		if (!posiblesCaminos.isEmpty()) {
+//			System.out.println("POSIBLES: ");
+//			for (int i = 0; i < posiblesCaminos.size(); i++) {
+//				System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
+//			}
+//			System.out.println("");
+			quesoNoVisitado = true;
+			recorreDFS(currentGrid, posiblesCaminos.remove(posiblesCaminos.size() - 1));
+			//System.out.println("REVENTAO");
+//			return caminoDFS.pollFirst();
 		}
-		System.out.println("");
-		System.out.println("SI MUERO AQUI ESTAMOS JODIDOS");
 		return BOMB;
 	}
 
@@ -392,6 +425,28 @@ public class M20A04aGRE extends Mouse {
 		if (currentGrid.canGoRight()) {
 			adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX() + 1, currentGrid.getY()));
 		}
+	}
+
+	public boolean actualizaPendientes(Grid celda) {
+		int numCaminos = 0;
+		if (!celdasVisitadas.containsKey(new Pair<>(celda.getX(), celda.getY() - 1)) && celda.canGoDown()) {
+			numCaminos++;
+		}
+		if (!celdasVisitadas.containsKey(new Pair<>(celda.getX(), celda.getY() + 1)) && celda.canGoUp()) {
+			numCaminos++;
+		}
+		if (!celdasVisitadas.containsKey(new Pair<>(celda.getX() - 1, celda.getY())) && celda.canGoLeft()) {
+			numCaminos++;
+		}
+		if (!celdasVisitadas.containsKey(new Pair<>(celda.getX() + 1, celda.getY())) && celda.canGoRight()) {
+			numCaminos++;
+		}
+//		System.out.println("COSA PENDIENTE: " + getPosicion(celda) + "----" + numCaminos);
+		if (numCaminos == 0) {
+			return true;
+		}
+		return false;
+
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
