@@ -49,21 +49,20 @@ public class M20A04aGRE extends Mouse {
     private final HashMap<Pair<Integer, Integer>, Grid> celdasVisitadas;
     private final ArrayList<Grid> posiblesCaminos;                                                //Almacena las celdas que contienen bifurcaciones no visitadas.
     private final HashMap<Pair<Integer, Integer>, ArrayList<Pair<Integer, Integer>>> adyacencias; //Almacena las adyacencias de las celdas visitadas.
-    private final HashSet<Pair<Integer, Integer>> visitadasDFS;                                   //Almacena las posiciones visitadas en la ultima búsqueda.
+    //private final HashSet<Pair<Integer, Integer>> visitadasDFS;                                   //Almacena las posiciones visitadas en la ultima búsqueda.
     private final ArrayList<Integer> posiblesMovActuales;                                         //ArrayList auxiliar para almacenar los posibles movimientos que se realizaran.
 
     /**
      * Pila para almacenar el camino recorrido.
      */
     private final Stack<Grid> pilaMovimientos;
-
-    private final Stack<Grid> pilaDFS; //Almacena los movimiento realizados en la búsqueda
-    private int contador = 0; //Contador para borrar la pila de movimientos
+    
 
     //COSA DE DFS2.0
-    private boolean hayDFS = false;
     private final LinkedList<Integer> caminoDFS;
-    private boolean quesoNoVisitado = false;
+    private boolean nuevoQueso = false;
+    private boolean quesoVisitado = false;
+    private boolean hayDFS = false;
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //                                   MÉTODOS PRINCIPALES
@@ -80,8 +79,7 @@ public class M20A04aGRE extends Mouse {
         posiblesMovActuales = new ArrayList<>();
         adyacencias = new HashMap<>();
         adyacencias.put(new Pair<>(0, 0), new ArrayList<>());
-        pilaDFS = new Stack<>();
-        visitadasDFS = new HashSet<>();
+        //visitadasDFS = new HashSet<>();
         caminoDFS = new LinkedList();
     }
 
@@ -94,34 +92,22 @@ public class M20A04aGRE extends Mouse {
      */
     @Override
     public int move(final Grid currentGrid, final Cheese cheese) {
-
-        Pair posicionQueso = new Pair(cheese.getX(), cheese.getY());
-
-        System.out.println("POSIBLES: ");
-        for (int i = 0; i < posiblesCaminos.size(); i++) {
-            System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
-        }
-        System.out.println("\n");
         
-        if (quesoNoVisitado) {
-            if (caminoDFS.size() == 1) {
-                quesoNoVisitado = false;
-            }
-            return caminoDFS.pollFirst();
+        if (nuevoQueso) {
+            Pair<Integer, Integer> posicionQueso = new Pair<>(cheese.getX(), cheese.getY());
+            quesoVisitado = celdasVisitadas.containsKey(posicionQueso);
+            nuevoQueso = false;
         }
-
-        if (celdasVisitadas.containsKey(posicionQueso)) {
-            if (!actualizaPendientes(currentGrid)) {
-                posiblesCaminos.add(currentGrid);
-            }
-            Pair posicionActual = new Pair(currentGrid.getX(), currentGrid.getY());
-            if (!celdasVisitadas.containsKey(posicionActual)) {
-                addHashMap(currentGrid);
-            }
-            if (hayDFS) {
+        debug();
+        if (quesoVisitado) {
+            if (!hayDFS) {
+                if (!celdasVisitadas.containsKey(getPosicion(currentGrid))) {
+                    addHashMap(currentGrid);
+                }
+                recorreDFS(currentGrid, new Grid(cheese.getX(), cheese.getY()), caminoDFS);
                 return caminoDFS.pollFirst();
+                
             } else {
-                recorreDFS(currentGrid, new Grid(cheese.getX(), cheese.getY()));
                 return caminoDFS.pollFirst();
             }
         } else {
@@ -131,16 +117,20 @@ public class M20A04aGRE extends Mouse {
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
+     * Devuelve la ruta a seguir desde la posicion hasta el destino
      *
      * @param posicion
      * @param destino
      */
-    public void recorreDFS(Grid posicion, Grid destino) {
+    public void recorreDFS(Grid posicion, Grid destino, LinkedList<Integer> camino) {
         Grid actual = new Grid(posicion.getX(), posicion.getY());
+        HashSet<Pair<Integer, Integer>> visitadasDFS = new HashSet<>();
         while (!mismaPosicion(actual, destino)) {
-            Pair<Integer, Integer> evaluando = new Pair(actual.getX(), actual.getY());
+            
+            Pair<Integer, Integer> evaluando = getPosicion(actual);
             visitadasDFS.add(evaluando);
             ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(evaluando);
+            System.out.println(adyacencias.containsKey(evaluando));
             Iterator<Pair<Integer, Integer>> it = lista.listIterator();
             boolean sigue = true;
             while (it.hasNext() && sigue) {
@@ -150,12 +140,12 @@ public class M20A04aGRE extends Mouse {
                 }
             }
             if (sigue) {
-                int mov = caminoDFS.pollLast();
+                int mov = camino.pollLast();
                 mov = contrario(mov);
                 actual = getCelda(actual, mov);
             } else {
                 Grid temp = new Grid(evaluando.getKey(), evaluando.getValue());
-                caminoDFS.add(relativa(actual, temp));
+                camino.add(relativa(actual, temp));
                 actual = temp;
             }
         }
@@ -187,7 +177,7 @@ public class M20A04aGRE extends Mouse {
                         return DOWN;
                     }
                     break;
-
+                
                 case LEFT:
                     if (currentGrid.canGoLeft() && !currentGrid.canGoDown() && !currentGrid.canGoUp() && !visitada(currentGrid, LEFT)) {
                         pilaMovimientos.push(currentGrid);
@@ -195,7 +185,7 @@ public class M20A04aGRE extends Mouse {
                         return LEFT;
                     }
                     break;
-
+                
                 case RIGHT:
                     if (currentGrid.canGoRight() && !currentGrid.canGoDown() && !currentGrid.canGoUp() && !visitada(currentGrid, RIGHT)) {
                         pilaMovimientos.push(currentGrid);
@@ -204,7 +194,7 @@ public class M20A04aGRE extends Mouse {
                     }
                     break;
             }
-
+            
             if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
                 posiblesMovActuales.add(UP);
             }
@@ -218,9 +208,9 @@ public class M20A04aGRE extends Mouse {
                 posiblesMovActuales.add(RIGHT);
             }
         }
-
+        
         addHashMap(currentGrid);
-
+        
         if (posiblesMovActuales.isEmpty()) {
             stuck = true;
             movAnterior = volverAnterior(currentGrid);
@@ -228,29 +218,29 @@ public class M20A04aGRE extends Mouse {
             movAnterior = posiblesMovActuales.get(generador.nextInt(posiblesMovActuales.size()));
             pilaMovimientos.push(currentGrid);
         }
-
+        
         for (int i = 0; i < posiblesCaminos.size(); i++) {
             if (mismaPosicion(posiblesCaminos.get(i), currentGrid)) {
                 if (actualizaPendientes(currentGrid)) {
                     posiblesCaminos.remove(i);
                 }
             }
-            if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX(), currentGrid.getY() + 1))) {
+            if (mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX(), currentGrid.getY() + 1))) {
                 if (actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX(), currentGrid.getY() + 1)))) {
                     posiblesCaminos.remove(i);
                 }
             }
-            if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX(), currentGrid.getY() - 1))) {
+            if (mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX(), currentGrid.getY() - 1))) {
                 if (actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX(), currentGrid.getY() - 1)))) {
                     posiblesCaminos.remove(i);
                 }
             }
-            if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX() - 1, currentGrid.getY()))) {
+            if (mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX() - 1, currentGrid.getY()))) {
                 if (actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX() - 1, currentGrid.getY())))) {
                     posiblesCaminos.remove(i);
                 }
             }
-            if (i < posiblesCaminos.size() && mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX() + 1, currentGrid.getY()))) {
+            if (mismaPosicion(posiblesCaminos.get(i), new Grid(currentGrid.getX() + 1, currentGrid.getY()))) {
                 if (actualizaPendientes(celdasVisitadas.get(new Pair(currentGrid.getX() + 1, currentGrid.getY())))) {
                     posiblesCaminos.remove(i);
                 }
@@ -268,10 +258,10 @@ public class M20A04aGRE extends Mouse {
      * @return Movimiento a tomar
      */
     public int volverAnterior(final Grid currentGrid) {
-        int cosa = posiblesCaminos.size() - 1;
-        if (posiblesCaminos.get(cosa) == currentGrid && cosa >= 0) {
+        int tam = posiblesCaminos.size() - 1;
+        if (posiblesCaminos.get(tam) == currentGrid && tam >= 0) {
             stuck = false;
-            posiblesCaminos.remove(cosa);
+            posiblesCaminos.remove(tam);
             pilaMovimientos.push(currentGrid);
             if (currentGrid.canGoUp() && !visitada(currentGrid, UP)) {
                 return UP;
@@ -306,11 +296,11 @@ public class M20A04aGRE extends Mouse {
             pilaMovimientos.pop();
             corrupta++;
         }
-
+        
         stuck = false;
         if (!posiblesCaminos.isEmpty()) {
-            quesoNoVisitado = true;
-            recorreDFS(currentGrid, posiblesCaminos.remove(posiblesCaminos.size() - 1));
+            quesoVisitado = true;
+            recorreDFS(currentGrid, posiblesCaminos.remove(posiblesCaminos.size() - 1), caminoDFS);
         }
         return BOMB;
     }
@@ -328,7 +318,7 @@ public class M20A04aGRE extends Mouse {
             adyacencias.put(new Pair<>(currentGrid.getX(), currentGrid.getY()), new ArrayList<>());
             incExploredGrids();
         }
-
+        
         if (!celdasVisitadas.containsKey(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1)) && currentGrid.canGoDown()) {
             numCaminos++;
         }
@@ -353,7 +343,7 @@ public class M20A04aGRE extends Mouse {
      * @param currentGrid Grid del que se actualizarán las adyascencias
      */
     public void actualizaAdy(Grid currentGrid) {
-
+        
         if (currentGrid.canGoDown()) {
             adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1));
         }
@@ -390,7 +380,7 @@ public class M20A04aGRE extends Mouse {
             numCaminos++;
         }
         return numCaminos == 0;
-
+        
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -399,10 +389,10 @@ public class M20A04aGRE extends Mouse {
      */
     @Override
     public void newCheese() {
-        pilaDFS.clear();
-        visitadasDFS.clear();
-        hayDFS = false;
         caminoDFS.clear();
+        nuevoQueso = true;
+        quesoVisitado = false;
+        hayDFS = false;
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -411,10 +401,11 @@ public class M20A04aGRE extends Mouse {
      */
     @Override
     public void respawned() {
-        pilaDFS.clear();
-        visitadasDFS.clear();
-        hayDFS = false;
         caminoDFS.clear();
+        nuevoQueso = true;
+        quesoVisitado = false;
+        hayDFS = false;
+        
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -429,7 +420,13 @@ public class M20A04aGRE extends Mouse {
         System.out.println(celdasVisitadas.size() + " celdas visitadas");
         System.out.println(posiblesCaminos.size() + " posibles caminos");
         System.out.println(pilaMovimientos.size() + " movimientos guardados");
-        System.out.println(corrupta + " veces pila corrupta");
+        System.out.println(adyacencias.size() + " adyascencias guardadas");
+        System.out.println("nuevoQueso: " + nuevoQueso + " - quesoVisitado: " + quesoVisitado + " - hayDFS: " + hayDFS);
+        System.out.println("POSIBLES: ");
+        for (int i = 0; i < posiblesCaminos.size(); i++) {
+            System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
+        }
+        System.out.println("\n");
         System.out.println("-------------------------------------------------------------------\n");
     }
 
@@ -487,20 +484,20 @@ public class M20A04aGRE extends Mouse {
     public boolean visitada(final Grid casilla, final int direccion) {
         int x = casilla.getX();
         int y = casilla.getY();
-
+        
         switch (direccion) {
             case UP:
                 y += 1;
                 break;
-
+            
             case DOWN:
                 y -= 1;
                 break;
-
+            
             case LEFT:
                 x -= 1;
                 break;
-
+            
             case RIGHT:
                 x += 1;
                 break;
