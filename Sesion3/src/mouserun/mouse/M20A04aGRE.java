@@ -58,10 +58,6 @@ public class M20A04aGRE extends Mouse {
      */
     private final Stack<Grid> pilaMovimientos;
 
-    private final Stack<Grid> pilaDFS; // Almacena los movimiento realizados en la búsqueda
-    private int contador = 0; // Contador para borrar la pila de movimientos
-    private boolean revertir = false;
-
     // COSA DE DFS2.0
     private boolean evaluado = false;
     private boolean hayDFS = false;
@@ -83,7 +79,6 @@ public class M20A04aGRE extends Mouse {
         posiblesMovActuales = new ArrayList<>();
         adyacencias = new HashMap<>();
         adyacencias.put(new Pair<>(0, 0), new ArrayList<>());
-        pilaDFS = new Stack<>();
         visitadasDFS = new HashSet<>();
         caminoDFS = new Stack<>();
     }
@@ -95,49 +90,32 @@ public class M20A04aGRE extends Mouse {
      * @param currentGrid Celda actual
      * @param cheese Queso
      */
-    // TODO: si no sabe donde esta el queso, seguir explorando
-    // si puede seguir explorando el camino, sigue
-    // si no, dfs a la ultima bifurcacion
-    // TODO: si sabe donde esta, hacer DFS
     @Override
     public int move(final Grid currentGrid, final Cheese cheese) {
 
         Pair<Integer, Integer> queso = new Pair<>(cheese.getX(), cheese.getY());
-//		System.out.println("BUENA1");
-        if (!posiblesCaminos.empty()) {
-            for (Grid camino : posiblesCaminos) {
-                System.out.printf("{%d , %d} ", camino.getX(), camino.getY());
-            }
-            System.out.printf("\n");
-        }
         if (objetivo != null) {
-            // System.out.println("YA CASI NO HAY DFS");
             if (mismaPosicion(currentGrid, objetivo)) {
                 hayDFS = false;
                 stuck = false;
                 objetivo = null;
-                pilaDFS.clear();
                 visitadasDFS.clear();
                 caminoDFS.clear();
                 pilaMovimientos.clear();
             }
         }
 
-//		System.out.println("BUENA2");
         if (hayDFS && !caminoDFS.empty()) {
             return caminoDFS.pop();
         } else if (!evaluado && celdasVisitadas.containsKey(queso)) {
-//			System.out.println("BUENA3");
             evaluado = true;
             Grid destino = new Grid(cheese.getX(), cheese.getY());
             if (addHashMap(currentGrid) == 1) {
                 posiblesCaminos.add(currentGrid);
             }
-            recorreDFS(destino, currentGrid);
-            //return caminoDFS.pop();
+            recorreGRE(destino, currentGrid);
             return -1;
         } else {
-//			System.out.println("BUENA4");
             return tomaDecision(currentGrid);
         }
     }
@@ -149,7 +127,7 @@ public class M20A04aGRE extends Mouse {
      * @param posicion Posicion en la que se encuentra el ratón
      * @param destino Posicion a la que quiere ir el ratón
      */
-    public void recorreDFS(Grid posicion, Grid destino) {
+    public void recorreGRE(Grid posicion, Grid destino) {
         Grid actual = new Grid(posicion.getX(), posicion.getY());
         // Itera mientras no llegue al destino
         while (!mismaPosicion(actual, destino)) {
@@ -162,13 +140,7 @@ public class M20A04aGRE extends Mouse {
             ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(evaluando);
             Iterator<Pair<Integer, Integer>> it = lista.listIterator();
             boolean sigue = true;
-            // Busca una adyacencia válida
-            /*while (it.hasNext() && sigue) {
-				evaluando = it.next();
-				if (celdasVisitadas.containsKey(evaluando) && !visitadasDFS.contains(evaluando)) {
-					sigue = false;
-				}
-			}*/
+
             int minDistancia = Integer.MAX_VALUE;
             while (it.hasNext()) {
                 Pair<Integer, Integer> temp = it.next();
@@ -193,8 +165,6 @@ public class M20A04aGRE extends Mouse {
                 actual = temp;
             }
         }
-//		System.out.println("DFS TERMINADO");
-        // System.out.println("CAMINO: " + caminoDFS);
         hayDFS = true;
     }
 
@@ -265,10 +235,8 @@ public class M20A04aGRE extends Mouse {
         // si no, avanza en una dirección aleatoria
         if (posiblesMovActuales.isEmpty()) {
             stuck = true;
-            // System.out.println("COSA MALA DE VOLVER ATRAS");
             addHashMap(currentGrid);
             movAnterior = volverAnterior(currentGrid);
-            // System.out.println("Camino: " + caminoDFS);
         } else {
             movAnterior = posiblesMovActuales.get(generador.nextInt(posiblesMovActuales.size()));
             pilaMovimientos.push(currentGrid);
@@ -287,11 +255,8 @@ public class M20A04aGRE extends Mouse {
      * @return Movimiento a tomar
      */
     public int volverAnterior(final Grid currentGrid) {
-        //if (!posiblesCaminos.isEmpty()) {
         objetivo = posiblesCaminos.pop();
-        // System.out.println("Objetivo: " + objetivo.getX() + "." + objetivo.getY());
-        recorreDFS(objetivo, currentGrid);
-        //}
+        recorreGRE(objetivo, currentGrid);
         return BOMB;
     }
 
@@ -368,10 +333,8 @@ public class M20A04aGRE extends Mouse {
      */
     @Override
     public void newCheese() {
-        pilaDFS.clear();
         visitadasDFS.clear();
         caminoDFS.clear();
-        revertir = true;
         hayDFS = false;
         evaluado = false;
         stuck = false;
@@ -383,7 +346,6 @@ public class M20A04aGRE extends Mouse {
      */
     @Override
     public void respawned() {
-        pilaDFS.clear();
         visitadasDFS.clear();
         caminoDFS.clear();
         pilaMovimientos.clear();
