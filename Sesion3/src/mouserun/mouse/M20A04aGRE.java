@@ -29,7 +29,6 @@ public class M20A04aGRE extends Mouse {
      * Variable para guardar el anterior movimiento realizado
      */
     private int movAnterior;
-    private int corrupta = 0; // Borrar al terminar
 
     /**
      * Boolean utilizado para determinar si el ratón se encuentra atrancado o
@@ -364,7 +363,6 @@ public class M20A04aGRE extends Mouse {
         System.out.println(celdasVisitadas.size() + " celdas visitadas");
         System.out.println(posiblesCaminos.size() + " posibles caminos");
         System.out.println(pilaMovimientos.size() + " movimientos guardados");
-        System.out.println(corrupta + " veces pila corrupta");
         System.out.println("====================ADYACENCIAS=====================");
         System.out.println(adyacencias);
         System.out.println("-------------------------------------------------------------------\n");

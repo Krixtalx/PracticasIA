@@ -81,8 +81,6 @@ public class M20A04aDFS extends Mouse {
             nuevoQueso = false;
         }
 
-        debug();
-
         if (quesoVisitado) {
             if (!hayDFS) {
                 if (!celdasVisitadas.containsKey(getPosicion(currentGrid))) {
