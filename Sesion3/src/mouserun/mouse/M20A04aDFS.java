@@ -82,7 +82,6 @@ public class M20A04aDFS extends Mouse {
             quesoVisitado = celdasVisitadas.containsKey(posicionQueso);
             nuevoQueso = false;
         }
-        debug();
         if (quesoVisitado) {
             if (!hayDFS) {
                 if (!celdasVisitadas.containsKey(getPosicion(currentGrid))) {
@@ -125,14 +124,14 @@ public class M20A04aDFS extends Mouse {
      *
      * @param posicion Grid en el que se encuentra el ratón
      * @param destino Grid al que se quiere llegar
-     * @param nivel Hasta que nivel llegará la busqueda del recorrido
+     * @param nivel Nivel hasta que se llegara inicialmente en la busqueda
      * @param camino Donde se guardará la ruta
      */
     public void recorreDFS(Grid posicion, Grid destino, int nivel, LinkedList<Integer> camino) {
         HashSet<Pair<Integer, Integer>> visitadasDFS = new HashSet<>();
         Grid actual;
         boolean encontrado = false;
-        boolean fin = false;
+        boolean fin;
         boolean siguienteDisponible;
         camino.clear();
 
@@ -141,7 +140,7 @@ public class M20A04aDFS extends Mouse {
             camino.clear();
             visitadasDFS.clear();
             fin = false;
-            
+
             while (!fin) {
                 Pair<Integer, Integer> evaluando = getPosicion(actual);
                 visitadasDFS.add(evaluando);
@@ -423,17 +422,6 @@ public class M20A04aDFS extends Mouse {
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
-     * @brief Devuelve si la celda a es igual a la celda b
-     * @param a
-     * @param b
-     * @return resultado
-     */
-    private boolean mismaPosicion(Grid a, Grid b) {
-        return a.getX() == b.getX() && a.getY() == b.getY();
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    /**
      * Devuelve el grid mas cercano a actual
      *
      * @param actual
@@ -599,6 +587,12 @@ public class M20A04aDFS extends Mouse {
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    /**
+     *
+     * @param actual
+     * @param movimiento
+     * @return El grid resultante de realizar el movimiento
+     */
     public Grid getCelda(Grid actual, int movimiento) {
         switch (movimiento) {
             case UP:
