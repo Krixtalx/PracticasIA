@@ -133,7 +133,6 @@ public class M20A04aDFS extends Mouse {
         boolean encontrado = false;
         boolean fin;
         boolean siguienteDisponible;
-        camino.clear();
 
         while (!encontrado) {
             actual = new Grid(posicion.getX(), posicion.getY());
