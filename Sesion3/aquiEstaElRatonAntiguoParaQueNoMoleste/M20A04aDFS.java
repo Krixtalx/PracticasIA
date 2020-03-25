@@ -302,18 +302,19 @@ public class M20A04aDFS extends Mouse {
      * @param currentGrid Grid del que se actualizarán las adyascencias
      */
     public void actualizaAdy(Grid currentGrid) {
+		Pair<Integer, Integer> par = new Pair<>(currentGrid.getX(), currentGrid.getY());
 
-        if (currentGrid.canGoDown()) {
-            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1));
+        if (currentGrid.canGoDown() && !adyacencias.get(par).contains(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1))) {
+            adyacencias.get(par).add(new Pair<>(currentGrid.getX(), currentGrid.getY() - 1));
         }
-        if (currentGrid.canGoUp()) {
-            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1));
+        if (currentGrid.canGoUp() && !adyacencias.get(par).contains(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1))) {
+            adyacencias.get(par).add(new Pair<>(currentGrid.getX(), currentGrid.getY() + 1));
         }
-        if (currentGrid.canGoLeft()) {
-            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX() - 1, currentGrid.getY()));
+        if (currentGrid.canGoLeft() && !adyacencias.get(par).contains(new Pair<>(currentGrid.getX() - 1, currentGrid.getY()))) {
+            adyacencias.get(par).add(new Pair<>(currentGrid.getX() - 1, currentGrid.getY()));
         }
-        if (currentGrid.canGoRight()) {
-            adyacencias.get(new Pair<>(currentGrid.getX(), currentGrid.getY())).add(new Pair<>(currentGrid.getX() + 1, currentGrid.getY()));
+        if (currentGrid.canGoRight() && !adyacencias.get(par).contains(new Pair<>(currentGrid.getX() + 1, currentGrid.getY()))) {
+            adyacencias.get(par).add(new Pair<>(currentGrid.getX() + 1, currentGrid.getY()));
         }
     }
 

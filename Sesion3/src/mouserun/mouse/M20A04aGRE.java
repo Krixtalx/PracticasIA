@@ -44,8 +44,11 @@ public class M20A04aGRE extends Mouse {
     private final HashMap<Pair<Integer, Integer>, ArrayList<Pair<Integer, Integer>>> adyacencias; //Almacena las adyacencias de las celdas visitadas.
     private final ArrayList<Integer> posiblesMovActuales;                                         //ArrayList auxiliar para almacenar los posibles movimientos que se realizaran.
 
-    //DFS
+    //GRE
     private final LinkedList<Integer> caminoGRE;
+    private final LinkedList<Integer> caminoGREVuelta;
+
+    //Estados
     private boolean nuevoQueso = false;
     private boolean quesoVisitado = false;
     private boolean hayCamino = false;
@@ -66,6 +69,7 @@ public class M20A04aGRE extends Mouse {
         adyacencias = new HashMap<>();
         adyacencias.put(new Pair<>(0, 0), new ArrayList<>());
         caminoGRE = new LinkedList();
+        caminoGREVuelta = new LinkedList<>();
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -79,22 +83,20 @@ public class M20A04aGRE extends Mouse {
     public int move(final Grid currentGrid, final Cheese cheese) {
 
         limpiezaPendientes();
-//		for (int i = 0; i < posiblesCaminos.size(); i++) {
-//			System.out.printf("%s ", getPosicion(posiblesCaminos.get(i)));
-//		}
-//		System.out.println("");
+
         if (nuevoQueso) {
             Pair<Integer, Integer> posicionQueso = new Pair<>(cheese.getX(), cheese.getY());
             quesoVisitado = celdasVisitadas.containsKey(posicionQueso);
             nuevoQueso = false;
         }
+        debug();
         if (quesoVisitado) {
             if (!hayCamino) {
                 if (!celdasVisitadas.containsKey(getPosicion(currentGrid))) {
                     addHashMap(currentGrid);
                 }
                 Grid temp = new Grid(cheese.getX(), cheese.getY());
-                recorreGRE(currentGrid, temp);
+                recorreGRE(currentGrid, temp, caminoGRE);
                 if (!caminoGRE.isEmpty()) {
                     return caminoGRE.pollFirst();
                 }
@@ -105,8 +107,8 @@ public class M20A04aGRE extends Mouse {
         } else {
             if (volviendo) {
                 if (hayCamino) {
-                    if (!caminoGRE.isEmpty()) {
-                        return caminoGRE.pollFirst();
+                    if (!caminoGREVuelta.isEmpty()) {
+                        return caminoGREVuelta.pollFirst();
                     } else {
                         volviendo = false;
                         hayCamino = false;
@@ -129,22 +131,25 @@ public class M20A04aGRE extends Mouse {
      *
      * @param posicion Posicion en la que se encuentra el ratón
      * @param destino Posicion a la que quiere ir el ratón
+     * @param camino
      */
-    public void recorreGRE(Grid posicion, Grid destino) {
+    public void recorreGRE(Grid posicion, Grid destino, LinkedList<Integer> camino) {
         HashSet<Pair<Integer, Integer>> visitadasGRE = new HashSet<>();
         Grid actual = new Grid(posicion.getX(), posicion.getY());
+        Pair<Integer, Integer> evaluando;
+        boolean sigue;
+        camino.clear();
+
         // Itera mientras no llegue al destino
         while (!mismaPosicion(actual, destino)) {
             // Añade a las visitadas la actual
-            Pair<Integer, Integer> evaluando = new Pair<>(actual.getX(), actual.getY());
+            evaluando = new Pair<>(actual.getX(), actual.getY());
             visitadasGRE.add(evaluando);
 
             // Obtiene las adyacencias de la actual
-			System.out.println("Evaluando: " + evaluando);
             ArrayList<Pair<Integer, Integer>> lista = adyacencias.get(evaluando);
-			System.out.println("Adyacencias: " + lista);
             Iterator<Pair<Integer, Integer>> it = lista.listIterator();
-            boolean sigue = true;
+            sigue = true;
 
             int minDistancia = Integer.MAX_VALUE;
             while (it.hasNext()) {
@@ -162,12 +167,12 @@ public class M20A04aGRE extends Mouse {
             // Si la hay, sigue el DFS
             // si no, vuelve atrás
             if (sigue) {
-                int mov = caminoGRE.pop();
+                int mov = contrario(camino.pollLast());
                 actual = getCelda(actual, mov);
             } else {
                 Grid temp = new Grid(evaluando.getKey(), evaluando.getValue());
-                caminoGRE.add(relativa(actual, temp));
-				visitadasGRE.add(evaluando);
+                camino.add(relativa(actual, temp));
+                visitadasGRE.add(evaluando);
                 actual = temp;
             }
         }
@@ -233,16 +238,12 @@ public class M20A04aGRE extends Mouse {
             volviendo = true;
             if (!posiblesCaminos.isEmpty()) {
                 Grid temp = masCercana(currentGrid);
-//				System.out.println("RECORRIDO DESDE: " + getPosicion(currentGrid) + " hasta " + getPosicion(temp));
-                recorreGRE(currentGrid, temp);
-//				System.out.println("RECORRIDO COMPLETO EN " + caminoGRE.size() + " PASOS");
-//				System.out.println("VOLVIENDO: " + volviendo + ", HAYGRE: " + hayCamino);
-                if (!caminoGRE.isEmpty()) {
-                    movAnterior = caminoGRE.pollFirst();
+                recorreGRE(currentGrid, temp, caminoGREVuelta);
+                if (!caminoGREVuelta.isEmpty()) {
+                    movAnterior = caminoGREVuelta.pollFirst();
                 } else {
                     movAnterior = BOMB;
                 }
-//				System.out.println("MOVANTES="+movAnterior);
             } else {
                 movAnterior = BOMB;
             }
@@ -279,11 +280,9 @@ public class M20A04aGRE extends Mouse {
         }
         if (numCaminos > 0) {
             posiblesCaminos.add(currentGrid);
-        }else if(posiblesCaminos.contains(currentGrid)){
-			posiblesCaminos.remove(currentGrid);
-		}
-		
-		actualizaAdy(currentGrid);
+        }
+
+        actualizaAdy(currentGrid);
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -612,7 +611,7 @@ public class M20A04aGRE extends Mouse {
      * @param b Grid a comparar
      * @return True si ambas tienen la misma posición, False en otro caso
      */
-	public boolean mismaPosicion(Grid a, Grid b){
-		return a.getX() == b.getX() && a.getY() == b.getY();
-	}
+    public boolean mismaPosicion(Grid a, Grid b) {
+        return a.getX() == b.getX() && a.getY() == b.getY();
+    }
 }
