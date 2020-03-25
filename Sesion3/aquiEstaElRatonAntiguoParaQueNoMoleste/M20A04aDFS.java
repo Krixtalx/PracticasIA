@@ -382,23 +382,6 @@ public class M20A04aDFS extends Mouse {
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //                                                    MÉTODOS AUXILIARES
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    /**
-     * Función de Debug. Borrar al final.
-     */
-    private void debug() {
-        System.out.println("\n-------------------------------------------------------------------");
-        System.out.println(posiblesMovActuales.size() + " posibles movimientos");
-        System.out.println(celdasVisitadas.size() + " celdas visitadas");
-        System.out.println(posiblesCaminos.size() + " posibles caminos");
-        System.out.println(adyacencias.size() + " adyascencias guardadas");
-        System.out.println("nuevoQueso: " + nuevoQueso + " - quesoVisitado: " + quesoVisitado + " - hayDFS: " + hayDFS + " - volviendo: " + volviendo);
-        System.out.println("POSIBLES: ");
-        for (int i = 0; i < posiblesCaminos.size(); i++) {
-            System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
-        }
-        System.out.println("\n");
-        System.out.println("-------------------------------------------------------------------\n");
-    }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     /**

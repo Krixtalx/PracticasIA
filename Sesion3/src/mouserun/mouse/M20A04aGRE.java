@@ -89,7 +89,7 @@ public class M20A04aGRE extends Mouse {
             quesoVisitado = celdasVisitadas.containsKey(posicionQueso);
             nuevoQueso = false;
         }
-        debug();
+		
         if (quesoVisitado) {
             if (!hayCamino) {
                 if (!celdasVisitadas.containsKey(getPosicion(currentGrid))) {
@@ -280,7 +280,9 @@ public class M20A04aGRE extends Mouse {
         }
         if (numCaminos > 0) {
             posiblesCaminos.add(currentGrid);
-        }
+        }else if(posiblesCaminos.contains(currentGrid)){
+			limpiezaPendientes();
+		}
 
         actualizaAdy(currentGrid);
     }
@@ -312,7 +314,7 @@ public class M20A04aGRE extends Mouse {
     private void limpiezaPendientes() {
         for (int i = 0; i < posiblesCaminos.size(); i++) {
             if (i < posiblesCaminos.size() && actualizaPendientes(posiblesCaminos.get(i))) {
-                posiblesCaminos.remove(posiblesCaminos.get(i));
+				posiblesCaminos.remove(posiblesCaminos.get(i));
             }
         }
     }
@@ -365,27 +367,6 @@ public class M20A04aGRE extends Mouse {
         quesoVisitado = false;
         hayCamino = false;
         volviendo = false;
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    //                                                    MÉTODOS AUXILIARES
-    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    /**
-     * Función de Debug. Borrar al final.
-     */
-    private void debug() {
-        System.out.println("\n-------------------------------------------------------------------");
-        System.out.println(posiblesMovActuales.size() + " posibles movimientos");
-        System.out.println(celdasVisitadas.size() + " celdas visitadas");
-        System.out.println(posiblesCaminos.size() + " posibles caminos");
-        System.out.println(adyacencias.size() + " adyascencias guardadas");
-        System.out.println("nuevoQueso: " + nuevoQueso + " - quesoVisitado: " + quesoVisitado + " - hayDFS: " + hayCamino + " - volviendo: " + volviendo);
-        System.out.println("POSIBLES: ");
-        for (int i = 0; i < posiblesCaminos.size(); i++) {
-            System.out.printf("%s, ", getPosicion(posiblesCaminos.get(i)));
-        }
-        System.out.println("\n");
-        System.out.println("-------------------------------------------------------------------\n");
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -28,7 +28,6 @@ public class M20A04a extends Mouse {
      * Variable para guardar el anterior movimiento realizado
      */
     private int movAnterior;
-    private int corrupta = 0; //Borrar al terminar
 
     /**
      * Boolean donde se almacena el estado del raton
@@ -129,7 +128,6 @@ public class M20A04a extends Mouse {
             movAnterior = posiblesMovActuales.get(generador.nextInt(posiblesMovActuales.size()));
             pilaMovimientos.push(currentGrid);
         }
-        //debug();
         posiblesCaminos.remove(new Pair(currentGrid.getX(), currentGrid.getY()));
         addHashMap(currentGrid);
         return movAnterior;
@@ -179,7 +177,6 @@ public class M20A04a extends Mouse {
                 return RIGHT;
             }
             pilaMovimientos.pop();
-            corrupta++;
         }
 
         stuck = false;
@@ -299,19 +296,6 @@ public class M20A04a extends Mouse {
         }
         Pair par = new Pair(x, y);
         return celdasVisitadas.containsKey(par);
-    }
-
-    /**
-     * Función de Debug. Borrar al final.
-     */
-    private void debug() {
-        System.out.println("\n-------------------------------------------------------------------");
-        System.out.println(posiblesMovActuales.size() + " posibles movimientos");
-        System.out.println(celdasVisitadas.size() + " celdas visitadas");
-        System.out.println(posiblesCaminos.size() + " posibles caminos");
-        System.out.println(pilaMovimientos.size() + " movimientos guardados");
-        System.out.println(corrupta + " veces pila corrupta");
-        System.out.println("-------------------------------------------------------------------\n");
     }
 
     /**
