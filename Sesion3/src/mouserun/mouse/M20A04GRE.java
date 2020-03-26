@@ -23,7 +23,7 @@ import static mouserun.game.Mouse.UP;
  * @author Cristóbal José Carmona (ccarmona@ujaen.es) y Ángel Miguel García Vico
  * (agvico@ujaen.es)
  */
-public class M20A04aGRE extends Mouse {
+public class M20A04GRE extends Mouse {
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //                                   ATRIBUTOS
@@ -60,7 +60,7 @@ public class M20A04aGRE extends Mouse {
     /**
      * Constructor (Puedes modificar el nombre a tu gusto).
      */
-    public M20A04aGRE() {
+    public M20A04GRE() {
         super("BreakGRE;");
         celdasVisitadas = new HashMap<>();
         generador = new Random();
