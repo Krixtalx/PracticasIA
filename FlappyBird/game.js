@@ -283,7 +283,7 @@ Game.prototype.display = function(){
 		self.display();
 	});
 }
-
+/*
 window.onload = function(){
 	var sprites = {
 		bird:"./img/bird.png",
@@ -310,4 +310,31 @@ window.onload = function(){
 		start();
 	})
 
+}
+*/
+gameStart = function(){
+		var sprites = {
+		bird:"./img/bird.png",
+		background:"./img/background.png",
+		pipetop:"./img/pipetop.png",
+		pipebottom:"./img/pipebottom.png"
+	}
+
+	var start = function(){
+		Neuvol = new Neuroevolution({
+			population:50,
+			network:[2, [2], 1],
+		});
+		game = new Game();
+		game.start();
+		game.update();
+		game.display();
+		this.speed(0);
+	}
+
+
+	loadImages(sprites, function(imgs){
+		images = imgs;
+		start();
+	})
 }

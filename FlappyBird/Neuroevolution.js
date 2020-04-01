@@ -343,36 +343,39 @@ var Neuroevolution = function (options) {
 			
 			//console.log("DATOS: " + data.network.weights.toString());
 			
-			
-			for(var i = inicio; i < inicio+variacion; i++){
-				var temp = data.network.weights[i];
-				data.network.weights[i] = g2.network.weights[i];
-				g2.network.weights[i] = temp;
-			}
-			
-			/*
-			for (var i in g2.network.weights) {
-				// Genetic crossover
-				// 0.5 is the crossover factor.
-				// FIXME Really should be a predefined constant.
-				if (Math.random() <= 0.5) {
+			if(document.getElementById("cruceModificado").checked){
+				for(var i = inicio; i < inicio+variacion; i++){
+					var temp = data.network.weights[i];
 					data.network.weights[i] = g2.network.weights[i];
+					g2.network.weights[i] = temp;
 				}
 				
 			}
-			*/
+			if(document.getElementById("cruceDefecto").checked){
+				for (var i in g2.network.weights) {
+					// Genetic crossover
+					// 0.5 is the crossover factor.
+					// FIXME Really should be a predefined constant.
+					if (Math.random() <= 0.5) {
+						data.network.weights[i] = g2.network.weights[i];
+					}
+				}
+				
+			}
 			
 			// Perform mutation on some weights.
 			for (var i in data.network.weights) {
 				if (Math.random() <= self.options.mutationRate) {
-					/*data.network.weights[i] += Math.random() *
+					if(document.getElementById("MutacionDefecto").checked){
+						data.network.weights[i] += Math.random() *
 						self.options.mutationRange *
 						2 -
 						self.options.mutationRange;
-					*/
-					
-					var nuevoPeso = this.operadorMutacion(data.network.weights[i]);
-					data.network.weights[i] = nuevoPeso;
+					}
+					if(document.getElementById("MutacionModificada").checked){
+						var nuevoPeso = this.operadorMutacion(data.network.weights[i]);
+						data.network.weights[i] = nuevoPeso;
+					}
 				}
 			}
 			datas.push(data);
@@ -382,10 +385,7 @@ var Neuroevolution = function (options) {
 	
 	Generation.prototype.operadorMutacion = function (valor){
 		var aleatorio = Math.random() * valor;
-		//resultado = (sin(PI(x - 1/2)) + 1) / 2
-		//var resultado = (Math.sin(Math.PI * (aleatorio - 0.5)) + 1) / 2;
 		var resultado = Math.sin(Math.PI * aleatorio); //<--- Jesucristo (mas o menos)
-		//var resultado = (Math.log(Math.sin(Math.PI * aleatorio))) / -4;
 		//var resultado = (Math.log(Math.sin(Math.PI * aleatorio)) / 4) + 1; //<--- Tiene buena pinta
 		//var resultado = Math.pow(Math.E, -8 * Math.pow(aleatorio - 0.5, 2));
 		return resultado;
