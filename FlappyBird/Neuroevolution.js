@@ -373,8 +373,11 @@ var Neuroevolution = function (options) {
 						self.options.mutationRange;
 					}
 					if(document.getElementById("MutacionModificada").checked){
-						var nuevoPeso = this.operadorMutacion(data.network.weights[i]);
-						data.network.weights[i] = nuevoPeso;
+						var valor = this.operadorMutacion(data.network.weights[i]);
+						data.network.weights[i] += valor *
+						self.options.mutationRange *
+						2 -
+						self.options.mutationRange;
 					}
 				}
 			}
