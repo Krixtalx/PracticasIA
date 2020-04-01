@@ -387,10 +387,15 @@ var Neuroevolution = function (options) {
 	}
 	
 	Generation.prototype.operadorMutacion = function (valor){
-		var aleatorio = Math.random() * valor;
-		var resultado = Math.sin(Math.PI * aleatorio); //<--- Jesucristo (mas o menos)
+		var aleatorio = Math.random();
+		//var resultado = Math.sin(Math.PI * aleatorio); //<--- Jesucristo (mas o menos)
 		//var resultado = (Math.log(Math.sin(Math.PI * aleatorio)) / 4) + 1; //<--- Tiene buena pinta
 		//var resultado = Math.pow(Math.E, -8 * Math.pow(aleatorio - 0.5, 2));
+		if(aleatorio < 0.5){
+			resultado = Math.sqrt((aleatorio - 0.5) / 2) + 0.5;
+		}else{
+			resultado = -1 * Math.sqrt(((-1 * aleatorio) + 0.5) / 2) + 0.5;
+		}
 		return resultado;
 	}
 

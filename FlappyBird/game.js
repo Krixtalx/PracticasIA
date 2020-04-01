@@ -171,7 +171,7 @@ Game.prototype.update = function(){
 	if(this.generation>=25||this.score >= 10000){
 		document.getElementById("contador").value--;
 		generaciones.push(this.generation);
-		maxScores.push(this.score);
+		maxScores.push(maxScore);
 		this.score=0;
 		this.generation=0;
 		gameStart();
