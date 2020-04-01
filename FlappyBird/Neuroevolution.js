@@ -386,7 +386,8 @@ var Neuroevolution = function (options) {
 		//var resultado = (Math.sin(Math.PI * (aleatorio - 0.5)) + 1) / 2;
 		//var resultado = Math.sin(Math.PI * aleatorio); //<--- Jesucristo (mas o menos)
 		//var resultado = (Math.log(Math.sin(Math.PI * aleatorio))) / -4;
-		var resultado = (Math.log(Math.sin(Math.PI * aleatorio)) / 4) + 1; //<--- Tiene buena pinta
+		//var resultado = (Math.log(Math.sin(Math.PI * aleatorio)) / 4) + 1; //<--- Tiene buena pinta
+		var resultado = Math.pow(Math.E, -8 * Math.pow(aleatorio - 0.5, 2));
 		return resultado;
 	}
 
