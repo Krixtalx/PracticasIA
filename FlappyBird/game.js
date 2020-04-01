@@ -155,6 +155,13 @@ Game.prototype.start = function(){
 }
 
 Game.prototype.update = function(){
+	
+	if(this.generation>=25||this.score >= 10000){
+		window.alert("Ha finalizado la ejecución con resultados: \n Gen: " + this.generation + "\n maxScore: "+ this.maxScore);
+		location.reload();
+		return true;
+	}
+	
 	this.backgroundx += this.backgroundSpeed;
 	var nextHoll = 0;
 	if(this.birds.length > 0){
@@ -294,6 +301,7 @@ window.onload = function(){
 		game.start();
 		game.update();
 		game.display();
+		this.speed(0);
 	}
 
 
