@@ -30,7 +30,7 @@ public class Conecta4 extends JFrame implements ActionListener {
     // Jugador 2, CPU por defecto
     private boolean jugadorcpu = true;
     // Jugador 2, CPU aleatorio por defecto
-    private boolean iaplayer = false;
+    private boolean iaplayer = true;
     // Marca si el jugador pulsa sobre el tablero
     private boolean pulsado;
 
@@ -60,8 +60,8 @@ public class Conecta4 extends JFrame implements ActionListener {
     private final JMenuItem salir = new JMenuItem("Salir");
     private final JRadioButton p1h = new JRadioButton("Humano", true);
     private final JRadioButton p2h = new JRadioButton("Humano", false);
-    private final JRadioButton p2c = new JRadioButton("CPU (Random)", true);
-    private final JRadioButton p2c2 = new JRadioButton("CPU (IA)", false);
+    private final JRadioButton p2c = new JRadioButton("CPU (Random)", false);
+    private final JRadioButton p2c2 = new JRadioButton("CPU (IA)", true);
     // Leyendas y cabeceras
     private String cabecera = "Pr\u00e1cticas de IA (Curso 2019-20)";
     private final JLabel nombre = new JLabel(cabecera, JLabel.CENTER);
