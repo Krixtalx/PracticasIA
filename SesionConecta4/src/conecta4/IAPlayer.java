@@ -24,69 +24,11 @@ import java.util.Scanner;
 public class IAPlayer extends Player {
 
 	private class Estado {
-
-		private final List<Estado> hijos;
-		private final Estado padre;
-		private final int[][] estTablero;
-		private int filaJugada;
-		private int colJugada;
-
-		public Estado(Estado padre, int[][] tablero) {
-			this.hijos = new ArrayList();
-			this.padre = padre;
-			int[][] temp = tablero;
-			estTablero = new int[temp.length][temp[0].length];
-			for (int i = 0; i < temp.length; i++) {
-				System.arraycopy(temp[i], 0, estTablero[i], 0, temp[i].length);
-			}
-			filaJugada = 0;
-			colJugada = 0;
-		}
-
-		public void mostrarTablero(int nivel) {
-			System.out.println("Nivel " + nivel);
-			for (int i = 0; i < estTablero.length; i++) {
-				for (int j = 0; j < estTablero[i].length; j++) {
-					System.out.printf(estTablero[i][j] + " ");
-				}
-				System.out.printf("\n");
-			}
-			System.out.printf("\n");
-
-			for (int i = 0; i < hijos.size(); i++) {
-				hijos.get(i).mostrarTablero(nivel + 1);
-			}
-		}
-
-		public void addFicha(int col, int jugador) {
-			int fila = estTablero.length - 1;
-			while (0 <= fila && estTablero[fila][col] != 0) {
-				fila--;
-			}
-
-			if (fila >= 0) {
-				estTablero[fila][col] = jugador;
-				filaJugada = fila;
-				colJugada = col;
-			}
-		}
-
-		private void generaHijos(int jugador, int conecta, int nivel) {
-			if (comprobarVictoria(filaJugada, colJugada, conecta) == 0 && nivel > 0) {
-				for (int i = 0; i < estTablero[0].length; i++) {
-					Estado nuevo = new Estado(this, estTablero);
-					nuevo.addFicha(i, jugador);
-					int jugHijo;
-					hijos.add(nuevo);
-					if (jugador == Conecta4.PLAYER1) {
-						jugHijo = Conecta4.PLAYER2;
-					} else {
-						jugHijo = Conecta4.PLAYER1;
-					}
-					nuevo.generaHijos(jugHijo, conecta, nivel - 1);
-				}
-			}
-		}
+		//TODO: si es la raiz, se guarda el tablero, si no, solo el movimiento
+		private int[][] tablero;
+		private int movimiento;
+		private ArrayList<Integer> hijos;
+		private int valor;
 
 		//Copia modificada del método Grid.checkWin
 		public int comprobarVictoria(int x, int y, int conecta) {
@@ -94,8 +36,8 @@ public class IAPlayer extends Player {
 			*	x fila
 			*	y columna
 			 */
-			int filas = estTablero.length;
-			int columnas = estTablero[0].length;
+			int filas = tablero.length;
+			int columnas = tablero[0].length;
 
 			//Comprobar vertical
 			int ganar1 = 0;
@@ -103,8 +45,8 @@ public class IAPlayer extends Player {
 			int ganador = 0;
 			boolean salir = false;
 			for (int i = 0; (i < filas) && !salir; i++) {
-				if (estTablero[i][y] != Conecta4.VACIO) {
-					if (estTablero[i][y] == Conecta4.PLAYER1) {
+				if (tablero[i][y] != Conecta4.VACIO) {
+					if (tablero[i][y] == Conecta4.PLAYER1) {
 						ganar1++;
 					} else {
 						ganar1 = 0;
@@ -115,7 +57,7 @@ public class IAPlayer extends Player {
 						salir = true;
 					}
 					if (!salir) {
-						if (estTablero[i][y] == Conecta4.PLAYER2) {
+						if (tablero[i][y] == Conecta4.PLAYER2) {
 							ganar2++;
 						} else {
 							ganar2 = 0;
@@ -135,8 +77,8 @@ public class IAPlayer extends Player {
 			ganar1 = 0;
 			ganar2 = 0;
 			for (int j = 0; (j < columnas) && !salir; j++) {
-				if (estTablero[x][j] != Conecta4.VACIO) {
-					if (estTablero[x][j] == Conecta4.PLAYER1) {
+				if (tablero[x][j] != Conecta4.VACIO) {
+					if (tablero[x][j] == Conecta4.PLAYER1) {
 						ganar1++;
 					} else {
 						ganar1 = 0;
@@ -147,7 +89,7 @@ public class IAPlayer extends Player {
 						salir = true;
 					}
 					if (ganador != Conecta4.PLAYER1) {
-						if (estTablero[x][j] == Conecta4.PLAYER2) {
+						if (tablero[x][j] == Conecta4.PLAYER2) {
 							ganar2++;
 						} else {
 							ganar2 = 0;
@@ -173,8 +115,8 @@ public class IAPlayer extends Player {
 				b--;
 			}
 			while (b < columnas && a < filas && !salir) {
-				if (estTablero[a][b] != Conecta4.VACIO) {
-					if (estTablero[a][b] == Conecta4.PLAYER1) {
+				if (tablero[a][b] != Conecta4.VACIO) {
+					if (tablero[a][b] == Conecta4.PLAYER1) {
 						ganar1++;
 					} else {
 						ganar1 = 0;
@@ -185,7 +127,7 @@ public class IAPlayer extends Player {
 						salir = true;
 					}
 					if (ganador != Conecta4.PLAYER1) {
-						if (estTablero[a][b] == Conecta4.PLAYER2) {
+						if (tablero[a][b] == Conecta4.PLAYER2) {
 							ganar2++;
 						} else {
 							ganar2 = 0;
@@ -214,8 +156,8 @@ public class IAPlayer extends Player {
 				b++;
 			}
 			while (b > -1 && a < filas && !salir) {
-				if (estTablero[a][b] != Conecta4.VACIO) {
-					if (estTablero[a][b] == Conecta4.PLAYER1) {
+				if (tablero[a][b] != Conecta4.VACIO) {
+					if (tablero[a][b] == Conecta4.PLAYER1) {
 						ganar1++;
 					} else {
 						ganar1 = 0;
@@ -226,7 +168,7 @@ public class IAPlayer extends Player {
 						salir = true;
 					}
 					if (ganador != Conecta4.PLAYER1) {
-						if (estTablero[a][b] == Conecta4.PLAYER2) {
+						if (tablero[a][b] == Conecta4.PLAYER2) {
 							ganar2++;
 						} else {
 							ganar2 = 0;
@@ -266,22 +208,25 @@ public class IAPlayer extends Player {
 		System.out.println("=====INICIO=====");
 		tablero.print();
 		System.out.println("=====ARBOL=====");
+		maxNivel = tablero.getFilas() * tablero.getColumnas();
+		totalGeneradas = 0;
 		mostrarHijos(tablero.toArray(), 0, Conecta4.PLAYER2, conecta);
+		System.out.println("generadas="+totalGeneradas);
 		int columna = getRandomColumn(tablero);
-		/*if (raiz == null) {
-			raiz = new Estado(null, tablero.toArray());
-			raiz.generaHijos(Conecta4.PLAYER2, conecta, 3);
-		}
-		System.out.println("================COSA DE VER================");
-		raiz.mostrarTablero(0);
-		 */
+		
 		return tablero.checkWin(tablero.setButton(columna, Conecta4.PLAYER2), columna, conecta);
 
 	} // turnoJugada
 
+	private int maxNivel;
+	private int totalGeneradas;
+	
 	public void mostrarHijos(int[][] tablero, int nivel, int jugador, int conecta) {
-		System.out.println("-----NIVEL " + nivel + "-----");
+		//System.out.println("-----NIVEL " + nivel + "-----");
 		for (int i = 0; i < tablero[0].length; i++) {
+//			if(nivel < 4){
+//				System.out.println(totalGeneradas);
+//			}
 			if (tablero[0][i] == 0) {
 				int[][] estTablero = new int[tablero.length][tablero[0].length];
 				for (int f = 0; f < estTablero.length; f++) {
@@ -297,24 +242,28 @@ public class IAPlayer extends Player {
 					estTablero[fila][i] = jugador;
 				}
 
-				System.out.println("Nivel " + nivel + ", hijo " + i);
-				for (int f = 0; f < estTablero.length; f++) {
-					for (int c = 0; c < estTablero[f].length; c++) {
-						System.out.printf(estTablero[f][c] + "	");
+				if (comprobarVictoria(estTablero, fila, i, conecta) == 0 /*&& nivel < maxNivel*/) {
+					mostrarHijos(estTablero, nivel + 1, -1 * jugador, conecta);
+				} else {
+					maxNivel = nivel;
+					/*System.out.println("Nivel " + nivel + ", hijo " + i);
+					for (int f = 0; f < estTablero.length; f++) {
+						for (int c = 0; c < estTablero[f].length; c++) {
+							System.out.printf(estTablero[f][c] + "	");
+						}
+						System.out.printf("\n");
 					}
 					System.out.printf("\n");
+					*/
+					//Scanner entrada = new Scanner(System.in);
+					//entrada.nextLine();
 				}
-				System.out.printf("\n");
-
-				if (comprobarVictoria(estTablero, fila, i, conecta) == 0) {
-					mostrarHijos(estTablero, nivel + 1, -1 * jugador, conecta);
-				}else{
-					Scanner entrada = new Scanner(System.in);
-					entrada.nextLine();
-				}
+				//System.out.printf("%10d\n", ++totalGeneradas);
+				totalGeneradas++;
 			}
+			
 		}
-		System.out.println("-----FIN NIVEL " + nivel + "-----");
+		//System.out.println("-----FIN NIVEL " + nivel + "-----");
 	}
 
 	public int comprobarVictoria(int[][] estTablero, int x, int y, int conecta) {
