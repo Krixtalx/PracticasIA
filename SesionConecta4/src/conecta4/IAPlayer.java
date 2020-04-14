@@ -40,7 +40,6 @@ public class IAPlayer extends Player {
         private byte valor;
 
         public Estado(Estado padre, byte movX, byte movY, byte nivel, boolean estFinal) {
-            //this.hijos = new ArrayList<>(4);
             this.hijo1 = null;
             this.hijo2 = null;
             this.hijo3 = null;
@@ -78,85 +77,33 @@ public class IAPlayer extends Player {
                             tableroEstadoHijo[j][i] = 1;
                         }
                         boolean estadoFinalHijo = false;
-                        valor = (byte) comprobarVictoria(tableroEstadoHijo, j, i);
-                        if (nivel >= 6 && nivel < 14) {
-                            estadoFinalHijo = valor != 0;
+                        byte valorHijo = (byte) comprobarVictoria(tableroEstadoHijo, j, i);
+                        if (nivel >= 5 && nivel < 14) {
+                            estadoFinalHijo = valorHijo != 0;
                         } else if (nivel == 14) {
                             estadoFinalHijo = true;
                         }
-                        //hijos.add(new Estado(this, (byte) j, (byte) i, (byte) (nivel + 1), estadoFinalHijo));
                         if (hijo1 == null) {
                             hijo1 = new Estado(this, (byte) j, (byte) i, (byte) (nivel + 1), estadoFinalHijo);
-                            hijo1.valor = (byte) (this.valor * -1);
+                            hijo1.valor = (byte) (valorHijo * -1);
                         } else if (hijo2 == null) {
                             hijo2 = new Estado(this, (byte) j, (byte) i, (byte) (nivel + 1), estadoFinalHijo);
-                            hijo2.valor = (byte) (this.valor * -1);
+                            hijo2.valor = (byte) (valorHijo * -1);
                         } else if (hijo3 == null) {
                             hijo3 = new Estado(this, (byte) j, (byte) i, (byte) (nivel + 1), estadoFinalHijo);
-                            hijo3.valor = (byte) (this.valor * -1);
+                            hijo3.valor = (byte) (valorHijo * -1);
                         } else if (hijo4 == null) {
                             hijo4 = new Estado(this, (byte) j, (byte) i, (byte) (nivel + 1), estadoFinalHijo);
-                            hijo4.valor = (byte) (this.valor * -1);
+                            hijo4.valor = (byte) (valorHijo * -1);
                         }
                     }
                 }
-
-                //TODO: el 4 -> a variable global
-                //Nivel par = max, nivel impar = min
-//                byte minimax;
-//                if (nivel % 2 == 0) {
-//                    minimax = Byte.MIN_VALUE;
-//                    if (hijo1 != null) {
-//                        if (hijo1.valor > minimax) {
-//                            minimax = hijo1.valor;
-//                        }
-//                    }
-//                    if (hijo2 != null) {
-//                        if (hijo2.valor > minimax) {
-//                            minimax = hijo2.valor;
-//                        }
-//                    }
-//                    if (hijo3 != null) {
-//                        if (hijo3.valor > minimax) {
-//                            minimax = hijo3.valor;
-//                        }
-//                    }
-//                    if (hijo4 != null) {
-//                        if (hijo4.valor > minimax) {
-//                            minimax = hijo4.valor;
-//                        }
-//                    }
-//                } else {
-//                    minimax = Byte.MAX_VALUE;
-//                    if (hijo1 != null) {
-//                        if (hijo1.valor < minimax) {
-//                            minimax = hijo1.valor;
-//                        }
-//                    }
-//                    if (hijo2 != null) {
-//                        if (hijo2.valor < minimax) {
-//                            minimax = hijo2.valor;
-//                        }
-//                    }
-//                    if (hijo3 != null) {
-//                        if (hijo3.valor < minimax) {
-//                            minimax = hijo3.valor;
-//                        }
-//                    }
-//                    if (hijo4 != null) {
-//                        if (hijo4.valor < minimax) {
-//                            minimax = hijo4.valor;
-//                        }
-//                    }
-//                }
-//
-//                this.valor = minimax;
             }
         }
 
-        private void actHijos() {
-            if (nivel % 2 == 0) {
-                if (hijo1 != null) {
+        public void actHijos() {
+            if ((nivel) % 2 == 0) {
+                if (hijo1 != null && !hijo1.estFinal) {
                     hijo1.actHijos();
                     hijo1.valor = Byte.MAX_VALUE;
                     if (hijo1.hijo1 != null) {
@@ -180,7 +127,7 @@ public class IAPlayer extends Player {
                         }
                     }
                 }
-                if (hijo2 != null) {
+                if (hijo2 != null && !hijo2.estFinal) {
                     hijo2.actHijos();
                     hijo2.valor = Byte.MAX_VALUE;
                     if (hijo2.hijo1 != null) {
@@ -204,7 +151,7 @@ public class IAPlayer extends Player {
                         }
                     }
                 }
-                if (hijo3 != null) {
+                if (hijo3 != null && !hijo3.estFinal) {
                     hijo3.actHijos();
                     hijo3.valor = Byte.MAX_VALUE;
                     if (hijo3.hijo1 != null) {
@@ -228,7 +175,7 @@ public class IAPlayer extends Player {
                         }
                     }
                 }
-                if (hijo4 != null) {
+                if (hijo4 != null && !hijo4.estFinal) {
                     hijo4.actHijos();
                     hijo4.valor = Byte.MAX_VALUE;
                     if (hijo4.hijo1 != null) {
@@ -253,7 +200,7 @@ public class IAPlayer extends Player {
                     }
                 }
             } else {
-                if (hijo1 != null) {
+                if (hijo1 != null && !hijo1.estFinal) {
                     hijo1.actHijos();
                     hijo1.valor = Byte.MIN_VALUE;
                     if (hijo1.hijo1 != null) {
@@ -277,7 +224,7 @@ public class IAPlayer extends Player {
                         }
                     }
                 }
-                if (hijo2 != null) {
+                if (hijo2 != null && !hijo2.estFinal) {
                     hijo2.actHijos();
                     hijo2.valor = Byte.MIN_VALUE;
                     if (hijo2.hijo1 != null) {
@@ -301,7 +248,7 @@ public class IAPlayer extends Player {
                         }
                     }
                 }
-                if (hijo3 != null) {
+                if (hijo3 != null && !hijo3.estFinal) {
                     hijo3.actHijos();
                     hijo3.valor = Byte.MIN_VALUE;
                     if (hijo3.hijo1 != null) {
@@ -325,7 +272,7 @@ public class IAPlayer extends Player {
                         }
                     }
                 }
-                if (hijo4 != null) {
+                if (hijo4 != null && !hijo4.estFinal) {
                     hijo4.actHijos();
                     hijo4.valor = Byte.MIN_VALUE;
                     if (hijo4.hijo1 != null) {
@@ -350,11 +297,11 @@ public class IAPlayer extends Player {
                     }
                 }
             }
+
         }
 
         public int getMejorJugada() {
             byte minimax = Byte.MIN_VALUE;
-            actHijos();
             if (hijo1 != null) {
                 if (hijo1.valor > minimax) {
                     minimax = hijo1.valor;
@@ -381,7 +328,7 @@ public class IAPlayer extends Player {
             return estadoActual.movY;
         }
 
-        private byte[][] construyeTablero() {
+        public byte[][] construyeTablero() {
             byte[][] tablero = new byte[tableroActual.length][tableroActual[0].length];
             for (int k = 0; k < tableroActual.length; k++) {
                 System.arraycopy(tableroActual[k], 0, tablero[k], 0, tableroActual[0].length);
@@ -405,10 +352,11 @@ public class IAPlayer extends Player {
             return tablero;
         }
 
-        private void print() {
+        public void print() {
             byte[][] tableroEstado = construyeTablero();
             System.out.println("EstadoFinal: " + estFinal);
             System.out.println("Nivel " + nivel);
+            System.out.println("Valor: " + valor);
             for (byte[] tableroEstado1 : tableroEstado) {
                 for (int j = 0; j < tableroEstado[0].length; j++) {
                     System.out.print(tableroEstado1[j] + "	");
@@ -418,12 +366,23 @@ public class IAPlayer extends Player {
             System.out.println();
         }
 
+        public void printHijos() {
+            System.out.println("Hijos");
+            if (hijo1 != null) {
+                hijo1.print();
+            }
+            if (hijo2 != null) {
+                hijo2.print();
+            }
+            if (hijo3 != null) {
+                hijo3.print();
+            }
+            if (hijo4 != null) {
+                hijo4.print();
+            }
+        }
+
         public Estado getHijo(int col) {
-            /*for (Estado hijo : hijos) {
-				if(hijo.movY == col){
-					return hijo;
-				}
-			}*/
             if (hijo1 != null && hijo1.movY == col) {
                 return hijo1;
             } else if (hijo2 != null && hijo2.movY == col) {
@@ -606,43 +565,24 @@ public class IAPlayer extends Player {
     @Override
     public int turnoJugada(Grid tablero, int conecta) {
         actTableroActual(tablero);
-        int posHijo = -1;
+        int posHijo;
+        this.conecta = conecta;
 
         if (estadoActual != null) {
-            System.out.println("ASI EMPIEZA LA COSA:");
-            estadoActual.print();
             posHijo = jugadaP1(tablero);
+            estadoActual = estadoActual.getHijo(posHijo);
+        } else {
+            estadoActual = new Estado(null, (byte) 0, (byte) 0, (byte) nivelActual, false);
+            estadoActual.actHijos();
         }
 
-        this.conecta = conecta;
-        if (estadoActual == null) {
-            estadoActual = new Estado(null, (byte) 0, (byte) 0, (byte) nivelActual, false);
-        } else {
-            if (posHijo == -1) {
-                System.out.println("ESTAMOS EN LA MIERDA BRO");
-                return -1;
-            }
-            estadoActual = estadoActual.getHijo(posHijo);
-        }
         System.out.println("----ESTADO ACTUAL----");
         estadoActual.print();
-        //new Scanner(System.in).nextLine();
-        // ...
+        estadoActual.printHijos();
+
         // Calcular la mejor columna posible donde hacer nuestra turnoJugada
-        //Pintar Ficha (sustituir 'columna' por el valor adecuado)
-        //Pintar Ficha
         int columna = estadoActual.getMejorJugada();
-        System.out.println("X:" + estadoActual.movX + "  Y:" + estadoActual.movY);
-        System.out.println("---Raiz---");
-        estadoActual.print();
         actTableroAnterior(estadoActual.construyeTablero());
-        /*System.out.println("=============ANTERIOR=============");
-		for (int i = 0; i < tableroAnterior.length; i++) {
-			for (int j = 0; j < tableroAnterior[i].length; j++) {
-				System.out.printf("%d	", tableroAnterior[i][j]);
-			}
-			System.out.println("");
-		}*/
         nivelActual++;
         return tablero.checkWin(tablero.setButton(columna, Conecta4.PLAYER2), columna, conecta);
 
@@ -667,25 +607,24 @@ public class IAPlayer extends Player {
 
     public int jugadaP1(Grid tablero) {
 
-        System.out.println(":::COMPARANDO:::");
-        for (int i = 0; i < tableroAnterior.length; i++) {
-            for (int j = 0; j < tableroAnterior[i].length; j++) {
-                System.out.printf("%d	", tableroAnterior[i][j]);
-            }
-            System.out.println("");
-        }
-        System.out.println("Y");
-        for (int i = 0; i < tableroActual.length; i++) {
-            for (int j = 0; j < tableroActual[i].length; j++) {
-                System.out.printf("%d	", tableroActual[i][j]);
-            }
-            System.out.println("");
-        }
-
+//        System.out.println(":::COMPARANDO:::");
+//        for (int i = 0; i < tableroAnterior.length; i++) {
+//            for (int j = 0; j < tableroAnterior[i].length; j++) {
+//                System.out.printf("%d	", tableroAnterior[i][j]);
+//            }
+//            System.out.println("");
+//        }
+//        System.out.println("Y");
+//        for (int i = 0; i < tableroActual.length; i++) {
+//            for (int j = 0; j < tableroActual[i].length; j++) {
+//                System.out.printf("%d	", tableroActual[i][j]);
+//            }
+//            System.out.println("");
+//        }
         for (int i = 0; i < tableroAnterior.length; i++) {
             for (int j = 0; j < tableroAnterior[i].length; j++) {
                 if (tableroAnterior[i][j] != tableroActual[i][j]) {
-                    System.out.println("COLUMNA DIFERENTE: " + j);
+//                    System.out.println("COLUMNA DIFERENTE: " + j);
                     return j;
                 }
             }
