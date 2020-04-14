@@ -103,147 +103,250 @@ public class IAPlayer extends Player {
 
                 //TODO: el 4 -> a variable global
                 //Nivel par = max, nivel impar = min
-                byte minimax;
-                if (nivel % 2 == 0) {
-                    minimax = Byte.MIN_VALUE;
-                    if (hijo1 != null) {
-                        if (hijo1.valor > minimax) {
-                            minimax = hijo1.valor;
-                        }
-                    }
-                    if (hijo2 != null) {
-                        if (hijo2.valor > minimax) {
-                            minimax = hijo2.valor;
-                        }
-                    }
-                    if (hijo3 != null) {
-                        if (hijo3.valor > minimax) {
-                            minimax = hijo3.valor;
-                        }
-                    }
-                    if (hijo4 != null) {
-                        if (hijo4.valor > minimax) {
-                            minimax = hijo4.valor;
-                        }
-                    }
-                } else {
-                    minimax = Byte.MAX_VALUE;
-                    if (hijo1 != null) {
-                        if (hijo1.valor < minimax) {
-                            minimax = hijo1.valor;
-                        }
-                    }
-                    if (hijo2 != null) {
-                        if (hijo2.valor < minimax) {
-                            minimax = hijo2.valor;
-                        }
-                    }
-                    if (hijo3 != null) {
-                        if (hijo3.valor < minimax) {
-                            minimax = hijo3.valor;
-                        }
-                    }
-                    if (hijo4 != null) {
-                        if (hijo4.valor < minimax) {
-                            minimax = hijo4.valor;
-                        }
-                    }
-                }
-
-                this.valor = minimax;
+//                byte minimax;
+//                if (nivel % 2 == 0) {
+//                    minimax = Byte.MIN_VALUE;
+//                    if (hijo1 != null) {
+//                        if (hijo1.valor > minimax) {
+//                            minimax = hijo1.valor;
+//                        }
+//                    }
+//                    if (hijo2 != null) {
+//                        if (hijo2.valor > minimax) {
+//                            minimax = hijo2.valor;
+//                        }
+//                    }
+//                    if (hijo3 != null) {
+//                        if (hijo3.valor > minimax) {
+//                            minimax = hijo3.valor;
+//                        }
+//                    }
+//                    if (hijo4 != null) {
+//                        if (hijo4.valor > minimax) {
+//                            minimax = hijo4.valor;
+//                        }
+//                    }
+//                } else {
+//                    minimax = Byte.MAX_VALUE;
+//                    if (hijo1 != null) {
+//                        if (hijo1.valor < minimax) {
+//                            minimax = hijo1.valor;
+//                        }
+//                    }
+//                    if (hijo2 != null) {
+//                        if (hijo2.valor < minimax) {
+//                            minimax = hijo2.valor;
+//                        }
+//                    }
+//                    if (hijo3 != null) {
+//                        if (hijo3.valor < minimax) {
+//                            minimax = hijo3.valor;
+//                        }
+//                    }
+//                    if (hijo4 != null) {
+//                        if (hijo4.valor < minimax) {
+//                            minimax = hijo4.valor;
+//                        }
+//                    }
+//                }
+//
+//                this.valor = minimax;
             }
         }
 
         private void actHijos() {
-            if (hijo1 != null) {
-                hijo1.valor = Byte.MAX_VALUE;
-                if (hijo1.hijo1 != null) {
-                    if (hijo1.hijo1.valor < hijo1.valor) {
-                        hijo1.valor = hijo1.hijo1.valor;
+            if (nivel % 2 == 0) {
+                if (hijo1 != null) {
+                    hijo1.actHijos();
+                    hijo1.valor = Byte.MAX_VALUE;
+                    if (hijo1.hijo1 != null) {
+                        if (hijo1.hijo1.valor < hijo1.valor) {
+                            hijo1.valor = hijo1.hijo1.valor;
+                        }
+                    }
+                    if (hijo1.hijo2 != null) {
+                        if (hijo1.hijo2.valor < hijo1.valor) {
+                            hijo1.valor = hijo1.hijo2.valor;
+                        }
+                    }
+                    if (hijo1.hijo3 != null) {
+                        if (hijo1.hijo3.valor < hijo1.valor) {
+                            hijo1.valor = hijo1.hijo3.valor;
+                        }
+                    }
+                    if (hijo1.hijo4 != null) {
+                        if (hijo1.hijo4.valor < hijo1.valor) {
+                            hijo1.valor = hijo1.hijo4.valor;
+                        }
                     }
                 }
-                if (hijo1.hijo2 != null) {
-                    if (hijo1.hijo2.valor < hijo1.valor) {
-                        hijo1.valor = hijo1.hijo2.valor;
+                if (hijo2 != null) {
+                    hijo2.actHijos();
+                    hijo2.valor = Byte.MAX_VALUE;
+                    if (hijo2.hijo1 != null) {
+                        if (hijo2.hijo1.valor < hijo2.valor) {
+                            hijo2.valor = hijo2.hijo1.valor;
+                        }
+                    }
+                    if (hijo2.hijo2 != null) {
+                        if (hijo2.hijo2.valor < hijo2.valor) {
+                            hijo2.valor = hijo2.hijo2.valor;
+                        }
+                    }
+                    if (hijo2.hijo3 != null) {
+                        if (hijo2.hijo3.valor < hijo2.valor) {
+                            hijo2.valor = hijo2.hijo3.valor;
+                        }
+                    }
+                    if (hijo2.hijo4 != null) {
+                        if (hijo2.hijo4.valor < hijo2.valor) {
+                            hijo2.valor = hijo2.hijo4.valor;
+                        }
                     }
                 }
-                if (hijo1.hijo3 != null) {
-                    if (hijo1.hijo3.valor < hijo1.valor) {
-                        hijo1.valor = hijo1.hijo3.valor;
+                if (hijo3 != null) {
+                    hijo3.actHijos();
+                    hijo3.valor = Byte.MAX_VALUE;
+                    if (hijo3.hijo1 != null) {
+                        if (hijo3.hijo1.valor < hijo3.valor) {
+                            hijo3.valor = hijo3.hijo1.valor;
+                        }
+                    }
+                    if (hijo3.hijo2 != null) {
+                        if (hijo3.hijo2.valor < hijo3.valor) {
+                            hijo3.valor = hijo3.hijo2.valor;
+                        }
+                    }
+                    if (hijo3.hijo3 != null) {
+                        if (hijo3.hijo3.valor < hijo3.valor) {
+                            hijo3.valor = hijo3.hijo3.valor;
+                        }
+                    }
+                    if (hijo3.hijo4 != null) {
+                        if (hijo3.hijo4.valor < hijo3.valor) {
+                            hijo3.valor = hijo3.hijo4.valor;
+                        }
                     }
                 }
-                if (hijo1.hijo4 != null) {
-                    if (hijo1.hijo4.valor < hijo1.valor) {
-                        hijo1.valor = hijo1.hijo4.valor;
+                if (hijo4 != null) {
+                    hijo4.actHijos();
+                    hijo4.valor = Byte.MAX_VALUE;
+                    if (hijo4.hijo1 != null) {
+                        if (hijo4.hijo1.valor < hijo4.valor) {
+                            hijo4.valor = hijo4.hijo1.valor;
+                        }
+                    }
+                    if (hijo4.hijo2 != null) {
+                        if (hijo4.hijo2.valor < hijo4.valor) {
+                            hijo4.valor = hijo4.hijo2.valor;
+                        }
+                    }
+                    if (hijo4.hijo3 != null) {
+                        if (hijo4.hijo3.valor < hijo4.valor) {
+                            hijo4.valor = hijo4.hijo3.valor;
+                        }
+                    }
+                    if (hijo4.hijo4 != null) {
+                        if (hijo4.hijo4.valor < hijo4.valor) {
+                            hijo4.valor = hijo4.hijo4.valor;
+                        }
                     }
                 }
-            }
-            if (hijo2 != null) {
-                hijo2.valor = Byte.MAX_VALUE;
-                if (hijo2.hijo1 != null) {
-                    if (hijo2.hijo1.valor < hijo2.valor) {
-                        hijo2.valor = hijo2.hijo1.valor;
+            } else {
+                if (hijo1 != null) {
+                    hijo1.actHijos();
+                    hijo1.valor = Byte.MIN_VALUE;
+                    if (hijo1.hijo1 != null) {
+                        if (hijo1.hijo1.valor > hijo1.valor) {
+                            hijo1.valor = hijo1.hijo1.valor;
+                        }
+                    }
+                    if (hijo1.hijo2 != null) {
+                        if (hijo1.hijo2.valor > hijo1.valor) {
+                            hijo1.valor = hijo1.hijo2.valor;
+                        }
+                    }
+                    if (hijo1.hijo3 != null) {
+                        if (hijo1.hijo3.valor > hijo1.valor) {
+                            hijo1.valor = hijo1.hijo3.valor;
+                        }
+                    }
+                    if (hijo1.hijo4 != null) {
+                        if (hijo1.hijo4.valor > hijo1.valor) {
+                            hijo1.valor = hijo1.hijo4.valor;
+                        }
                     }
                 }
-                if (hijo2.hijo2 != null) {
-                    if (hijo2.hijo2.valor < hijo2.valor) {
-                        hijo2.valor = hijo2.hijo2.valor;
+                if (hijo2 != null) {
+                    hijo2.actHijos();
+                    hijo2.valor = Byte.MIN_VALUE;
+                    if (hijo2.hijo1 != null) {
+                        if (hijo2.hijo1.valor > hijo2.valor) {
+                            hijo2.valor = hijo2.hijo1.valor;
+                        }
+                    }
+                    if (hijo2.hijo2 != null) {
+                        if (hijo2.hijo2.valor > hijo2.valor) {
+                            hijo2.valor = hijo2.hijo2.valor;
+                        }
+                    }
+                    if (hijo2.hijo3 != null) {
+                        if (hijo2.hijo3.valor > hijo2.valor) {
+                            hijo2.valor = hijo2.hijo3.valor;
+                        }
+                    }
+                    if (hijo2.hijo4 != null) {
+                        if (hijo2.hijo4.valor > hijo2.valor) {
+                            hijo2.valor = hijo2.hijo4.valor;
+                        }
                     }
                 }
-                if (hijo2.hijo3 != null) {
-                    if (hijo2.hijo3.valor < hijo2.valor) {
-                        hijo2.valor = hijo2.hijo3.valor;
+                if (hijo3 != null) {
+                    hijo3.actHijos();
+                    hijo3.valor = Byte.MIN_VALUE;
+                    if (hijo3.hijo1 != null) {
+                        if (hijo3.hijo1.valor > hijo3.valor) {
+                            hijo3.valor = hijo3.hijo1.valor;
+                        }
+                    }
+                    if (hijo3.hijo2 != null) {
+                        if (hijo3.hijo2.valor > hijo3.valor) {
+                            hijo3.valor = hijo3.hijo2.valor;
+                        }
+                    }
+                    if (hijo3.hijo3 != null) {
+                        if (hijo3.hijo3.valor > hijo3.valor) {
+                            hijo3.valor = hijo3.hijo3.valor;
+                        }
+                    }
+                    if (hijo3.hijo4 != null) {
+                        if (hijo3.hijo4.valor > hijo3.valor) {
+                            hijo3.valor = hijo3.hijo4.valor;
+                        }
                     }
                 }
-                if (hijo2.hijo4 != null) {
-                    if (hijo2.hijo4.valor < hijo2.valor) {
-                        hijo2.valor = hijo2.hijo4.valor;
+                if (hijo4 != null) {
+                    hijo4.actHijos();
+                    hijo4.valor = Byte.MIN_VALUE;
+                    if (hijo4.hijo1 != null) {
+                        if (hijo4.hijo1.valor > hijo4.valor) {
+                            hijo4.valor = hijo4.hijo1.valor;
+                        }
                     }
-                }
-            }
-            if (hijo3 != null) {
-                hijo3.valor = Byte.MAX_VALUE;
-                if (hijo3.hijo1 != null) {
-                    if (hijo3.hijo1.valor < hijo3.valor) {
-                        hijo3.valor = hijo3.hijo1.valor;
+                    if (hijo4.hijo2 != null) {
+                        if (hijo4.hijo2.valor > hijo4.valor) {
+                            hijo4.valor = hijo4.hijo2.valor;
+                        }
                     }
-                }
-                if (hijo3.hijo2 != null) {
-                    if (hijo3.hijo2.valor < hijo3.valor) {
-                        hijo3.valor = hijo3.hijo2.valor;
+                    if (hijo4.hijo3 != null) {
+                        if (hijo4.hijo3.valor > hijo4.valor) {
+                            hijo4.valor = hijo4.hijo3.valor;
+                        }
                     }
-                }
-                if (hijo3.hijo3 != null) {
-                    if (hijo3.hijo3.valor < hijo3.valor) {
-                        hijo3.valor = hijo3.hijo3.valor;
-                    }
-                }
-                if (hijo3.hijo4 != null) {
-                    if (hijo3.hijo4.valor < hijo3.valor) {
-                        hijo3.valor = hijo3.hijo4.valor;
-                    }
-                }
-            }
-            if (hijo4 != null) {
-                hijo4.valor = Byte.MAX_VALUE;
-                if (hijo4.hijo1 != null) {
-                    if (hijo4.hijo1.valor < hijo4.valor) {
-                        hijo4.valor = hijo4.hijo1.valor;
-                    }
-                }
-                if (hijo4.hijo2 != null) {
-                    if (hijo4.hijo2.valor < hijo4.valor) {
-                        hijo4.valor = hijo4.hijo2.valor;
-                    }
-                }
-                if (hijo4.hijo3 != null) {
-                    if (hijo4.hijo3.valor < hijo4.valor) {
-                        hijo4.valor = hijo4.hijo3.valor;
-                    }
-                }
-                if (hijo4.hijo4 != null) {
-                    if (hijo4.hijo4.valor < hijo4.valor) {
-                        hijo4.valor = hijo4.hijo4.valor;
+                    if (hijo4.hijo4 != null) {
+                        if (hijo4.hijo4.valor > hijo4.valor) {
+                            hijo4.valor = hijo4.hijo4.valor;
+                        }
                     }
                 }
             }
