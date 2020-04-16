@@ -1,5 +1,8 @@
 package conecta4;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.Stack;
 
 /**
@@ -50,6 +53,7 @@ public class IAPlayer extends Player {
             this.nivel = nivel;
             this.estFinal = estFinal;
 
+			//this.print();
             generados++;
             genHijos();
         }
@@ -98,7 +102,9 @@ public class IAPlayer extends Player {
                         }
                     }
                 }
-            }
+            }//else if(this.comprobarVictoria(construyeTablero(), movX, movY) != 0){
+				//this.print();
+			//}
         }
 
         public void actHijos() {
@@ -392,9 +398,27 @@ public class IAPlayer extends Player {
             } else if (hijo4 != null && hijo4.movY == col) {
                 return hijo4;
             }
-            System.out.println("ESTAMOS EN LA MIERDA (getHijo)");
+            System.out.println("Algo salio mal (getHijo)");
             return null;
         }
+		
+		public ArrayList<Estado> getListaHijos(){
+			ArrayList<Estado> lista = new ArrayList<>();
+			if(hijo1 != null){
+				lista.add(hijo1);
+			}
+			if(hijo2 != null){
+				lista.add(hijo2);
+			}
+			if(hijo3 != null){
+				lista.add(hijo3);
+			}
+			if(hijo4 != null){
+				lista.add(hijo4);
+			}
+			
+			return lista;
+		}
 
         public int comprobarVictoria(byte[][] estTablero, int x, int y) {
             /*
@@ -576,10 +600,15 @@ public class IAPlayer extends Player {
             estadoActual.actHijos();
         }
 
-        System.out.println("----ESTADO ACTUAL----");
-        estadoActual.print();
-        estadoActual.printHijos();
+        //System.out.println("----ESTADO ACTUAL----");
+        //estadoActual.print();
+        //estadoActual.printHijos();
 
+		System.out.println("----RAMA ALEATORIA----");
+		mostrarRama();
+		System.out.println("----FIN RAMA ALEATORIA----");
+		new Scanner(System.in).nextLine();
+		
         // Calcular la mejor columna posible donde hacer nuestra turnoJugada
         int columna = estadoActual.getMejorJugada();
         actTableroAnterior(estadoActual.construyeTablero());
@@ -606,31 +635,24 @@ public class IAPlayer extends Player {
     }
 
     public int jugadaP1(Grid tablero) {
-
-//        System.out.println(":::COMPARANDO:::");
-//        for (int i = 0; i < tableroAnterior.length; i++) {
-//            for (int j = 0; j < tableroAnterior[i].length; j++) {
-//                System.out.printf("%d	", tableroAnterior[i][j]);
-//            }
-//            System.out.println("");
-//        }
-//        System.out.println("Y");
-//        for (int i = 0; i < tableroActual.length; i++) {
-//            for (int j = 0; j < tableroActual[i].length; j++) {
-//                System.out.printf("%d	", tableroActual[i][j]);
-//            }
-//            System.out.println("");
-//        }
         for (int i = 0; i < tableroAnterior.length; i++) {
             for (int j = 0; j < tableroAnterior[i].length; j++) {
                 if (tableroAnterior[i][j] != tableroActual[i][j]) {
-//                    System.out.println("COLUMNA DIFERENTE: " + j);
                     return j;
                 }
             }
         }
         return -1;
     }
-// turnoJugada
+	
+	public void mostrarRama(){
+		ArrayList<Estado> hijos = estadoActual.getListaHijos();
+		Random generador = new Random();
+		while(!hijos.isEmpty()){
+			int elegido = generador.nextInt(hijos.size());
+			hijos.get(elegido).print();
+			hijos = hijos.get(elegido).getListaHijos();
+		}
+	}
 
 } // IAPlayer
