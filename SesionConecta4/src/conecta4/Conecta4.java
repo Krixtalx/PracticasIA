@@ -145,11 +145,6 @@ public class Conecta4 extends JFrame implements ActionListener {
 
     public void finJuego(int ganador) {
         // Comprobamos si llegamos al final del juego
-        // Empate!!!
-        if (movimiento >= FILAS * COLUMNAS) {
-            JOptionPane.showMessageDialog(this, "¡Empate!", "Conecta-4", JOptionPane.INFORMATION_MESSAGE);
-            reset();
-        }
         switch (ganador) {
             case PLAYER1:
                 JOptionPane.showMessageDialog(this, "Winner, Jugador 1\nen " + movimiento + " movimientos!", "Conecta-4", JOptionPane.INFORMATION_MESSAGE, juego.getFicha1());
@@ -161,6 +156,12 @@ public class Conecta4 extends JFrame implements ActionListener {
                 System.out.println("Winner: Jugador 2, en " + movimiento + " movimientos.");
                 reset();
                 break;
+        }
+
+        // Empate!!!
+        if (movimiento >= FILAS * COLUMNAS) {
+            JOptionPane.showMessageDialog(this, "¡Empate!", "Conecta-4", JOptionPane.INFORMATION_MESSAGE);
+            reset();
         }
 
     } // finJuego
@@ -278,7 +279,7 @@ public class Conecta4 extends JFrame implements ActionListener {
         System.out.println("Conecta4 - 4 en Raya");
         System.out.println("-----------------------------------------");
         System.out.println("Inteligencia Artificial - Curso 2019-20");
-        
+
         System.out.println();
         System.out.println("Nueva partida.");
         System.out.println("Tama\u00f1o del tablero: " + FILAS + " filas x " + COLUMNAS + " columnas.");
