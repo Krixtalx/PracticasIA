@@ -36,7 +36,7 @@ public class IAPlayer extends Player {
 		private final byte nivel;
 		private final boolean estFinal;
 
-		private byte valor;
+		private int valor;
 
 		public Estado(Estado padre, byte movX, byte movY, byte nivel, boolean estFinal, int conecta) {
 			if (!estFinal) {
@@ -50,10 +50,18 @@ public class IAPlayer extends Player {
 			this.nivel = nivel;
 			this.estFinal = estFinal;
 
+			if (nivel % 2 == 0) {
+				valor = Integer.MIN_VALUE;
+			} else {
+				valor = Integer.MAX_VALUE;
+			}
 			//this.print();
 			generados++;
 			if (nivel < nivelMaximo) {
 				genHijos(conecta);
+			} else {
+				valor = calculaValor(construyeTablero(), conecta);
+				this.print();
 			}
 		}
 
@@ -80,15 +88,22 @@ public class IAPlayer extends Player {
 							tableroEstadoHijo[j][i] = 1;
 						}
 						boolean estadoFinalHijo = false;
-						byte valorHijo = (byte) comprobarVictoria(tableroEstadoHijo, j, i, conecta);
 						if (nivel >= 5 && nivel < 14) {
-							estadoFinalHijo = valorHijo != 0;
+							estadoFinalHijo = comprobarVictoria(tableroEstadoHijo, j, i, conecta) != 0;
 						} else if (nivel == 14) {
 							estadoFinalHijo = true;
 						}
 						Estado nuevo = new Estado(this, (byte) j, (byte) i, (byte) (nivel + 1), estadoFinalHijo, conecta);
-						nuevo.valor = (byte) (valorHijo * -1);
 						hijos.add(nuevo);
+						if (nivel % 2 == 0) {
+							if (nuevo.valor > this.valor) {
+								this.valor = nuevo.valor;
+							}
+						} else {
+							if (nuevo.valor < this.valor) {
+								this.valor = nuevo.valor;
+							}
+						}
 					}
 				}
 			}//else if(this.comprobarVictoria(construyeTablero(), movX, movY) != 0){
@@ -96,8 +111,8 @@ public class IAPlayer extends Player {
 			//}
 		}
 
-		private byte mayorHijos() {
-			byte max = Byte.MIN_VALUE;
+		private int mayorHijos() {
+			int max = Integer.MIN_VALUE;
 			for (Estado hijo : hijos) {
 				if (hijo.valor > max) {
 					max = hijo.valor;
@@ -106,8 +121,8 @@ public class IAPlayer extends Player {
 			return max;
 		}
 
-		private byte menorHijos() {
-			byte min = Byte.MAX_VALUE;
+		private int menorHijos() {
+			int min = Integer.MAX_VALUE;
 			for (Estado hijo : hijos) {
 				if (hijo.valor < min) {
 					min = hijo.valor;
@@ -135,7 +150,7 @@ public class IAPlayer extends Player {
 		}
 
 		public int getMejorJugada() {
-			byte minimax = Byte.MIN_VALUE;
+			int minimax = Byte.MIN_VALUE;
 			for (Estado hijo : hijos) {
 				if (hijo.valor > minimax) {
 					minimax = hijo.valor;
@@ -372,18 +387,15 @@ public class IAPlayer extends Player {
 	 */
 	@Override
 	public int turnoJugada(Grid tablero, int conecta) {
-
+		/*
 		byte tab[][] = {
-			{0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 1, 0},
-			{0, 0, 0, 0, 0, 0, 0},
-			{0, 1, 0, 1, 0, 0, 1},
-			{0, 1, 0, 0, 0, 0, 0},
-			{1, 0, 0, 0, 0, 0, 0}
-		};
+			{0, 0, 0, -1},
+			{0, 0, 0, 1},
+			{0, 0, -1, -1},
+			{0, 0, 1, 1},};
 		System.out.println("valor: " + calculaValor(tab, conecta));
 		System.exit(0);
-
+		 */
 		actTableroActual(tablero);
 		int posHijo;
 
@@ -393,7 +405,6 @@ public class IAPlayer extends Player {
 		} else {
 			estadoActual = new Estado(null, (byte) 0, (byte) 0, (byte) nivelActual, false, conecta);
 			estadoActual.actHijos();
-			System.out.println("cosa");
 		}
 
 		//System.out.println("----ESTADO ACTUAL----");
@@ -520,23 +531,25 @@ public class IAPlayer extends Player {
 								}
 								if (tablero[f + contador][c + contador] == inicial && !evaluadosID[f + contador][c + contador]) {
 									suma *= 10;
-								} else {
+								} else if (tablero[f + contador][c + contador] == 0) {
 									sumaTotal += suma;
 									inicial = tablero[f + contador][c + contador];
+									suma = inicial;
+								} else {
+									inicial = 0;
 									suma = inicial;
 								}
 							}
 							evaluadosID[f + contador][c + contador] = true;
 							contador++;
 						}
-						System.out.printf("sumando [%d][%d]: %d\n", f,c,suma);
 						sumaTotal += suma;
 					}
 				}
 
 				if (!evaluadosDI[f][c]) {
 					//Derecha a izquierda hacia abajo
-					if (f + conecta <= tablero.length && c+1 >= conecta) {
+					if (f + conecta <= tablero.length && c + 1 >= conecta) {
 						int inicial = tablero[f][c];
 						int suma = inicial * 10;
 						evaluadosDI[f][c] = true;
@@ -549,9 +562,12 @@ public class IAPlayer extends Player {
 								}
 								if (tablero[f + contador][c - contador] == inicial && !evaluadosDI[f + contador][c - contador]) {
 									suma *= 10;
-								} else {
+								} else if (tablero[f + contador][c - contador] == 0) {
 									sumaTotal += suma;
 									inicial = tablero[f + contador][c - contador];
+									suma = inicial;
+								} else {
+									inicial = 0;
 									suma = inicial;
 								}
 							}
