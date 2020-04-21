@@ -61,7 +61,7 @@ public class IAPlayer extends Player {
 				genHijos(conecta);
 			} else {
 				valor = calculaValor(construyeTablero(), conecta);
-				this.print();
+				//this.print();
 			}
 		}
 
@@ -396,30 +396,47 @@ public class IAPlayer extends Player {
 		System.out.println("valor: " + calculaValor(tab, conecta));
 		System.exit(0);
 		 */
+
+		System.out.println("ESTADO INICIAL LLAMADA:");
+		tablero.print();
+		
+		if (nivelActual == nivelMaximo) {
+			estadoActual.print();
+			nivelMaximo += 3;
+			estadoActual.genHijos(conecta);
+			estadoActual.print();
+			for (Estado hijo : estadoActual.getListaHijos()) {
+				hijo.print();
+			}
+			nivelMaximo--;
+		}
 		actTableroActual(tablero);
 		int posHijo;
 
 		if (estadoActual != null) {
 			posHijo = jugadaP1(tablero);
 			estadoActual = estadoActual.getHijo(posHijo);
+			nivelActual++;
 		} else {
 			estadoActual = new Estado(null, (byte) 0, (byte) 0, (byte) nivelActual, false, conecta);
-			estadoActual.actHijos();
 		}
 
 		//System.out.println("----ESTADO ACTUAL----");
 		//estadoActual.print();
 		//estadoActual.printHijos();
-		/*
 		System.out.println("----RAMA ALEATORIA----");
 		mostrarRama();
 		System.out.println("----FIN RAMA ALEATORIA----");
-		new Scanner(System.in).nextLine();
+		/*new Scanner(System.in).nextLine();
 		 */
 		// Calcular la mejor columna posible donde hacer nuestra turnoJugada
 		int columna = estadoActual.getMejorJugada();
 		actTableroAnterior(estadoActual.construyeTablero());
+		
+		System.out.println("ESTADO FINAL LLAMADA:");
+		estadoActual.print();
 		nivelActual++;
+		
 		return tablero.checkWin(tablero.setButton(columna, Conecta4.PLAYER2), columna, conecta);
 
 	}
@@ -455,7 +472,7 @@ public class IAPlayer extends Player {
 	public void mostrarRama() {
 		ArrayList<Estado> hijos = estadoActual.getListaHijos();
 		Random generador = new Random();
-		while (hijos != null) {
+		while (hijos != null && hijos.size() > 0) {
 			int elegido = generador.nextInt(hijos.size());
 			hijos.get(elegido).print();
 			hijos = hijos.get(elegido).getListaHijos();
