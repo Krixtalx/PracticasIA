@@ -20,6 +20,7 @@ public class IAPlayer extends Player {
 
 	private Estado estadoActual = null;
 	private byte nivelActual = 0;
+	private int nivelBase = 0;
 	private int nivelMaximo = 5;
 	public byte[][] tableroActual;
 	private byte[][] tableroAnterior;
@@ -61,7 +62,7 @@ public class IAPlayer extends Player {
 				genHijos(conecta);
 			} else {
 				valor = calculaValor(construyeTablero(), conecta);
-				//this.print();
+				this.print();
 			}
 		}
 
@@ -387,36 +388,39 @@ public class IAPlayer extends Player {
 	 */
 	@Override
 	public int turnoJugada(Grid tablero, int conecta) {
-		/*
+		
 		byte tab[][] = {
-			{0, 0, 0, -1},
-			{0, 0, 0, 1},
-			{0, 0, -1, -1},
-			{0, 0, 1, 1},};
+			{0,	0,	0,	-1},
+			{0,	0,	0,	1},
+			{0,	1,	1,	1},
+			{-1,	-1,	-1,	1}};
 		System.out.println("valor: " + calculaValor(tab, conecta));
 		System.exit(0);
-		 */
-
-		System.out.println("ESTADO INICIAL LLAMADA:");
-		tablero.print();
 		
-		if (nivelActual == nivelMaximo) {
-			estadoActual.print();
-			nivelMaximo += 3;
-			estadoActual.genHijos(conecta);
-			estadoActual.print();
-			for (Estado hijo : estadoActual.getListaHijos()) {
-				hijo.print();
+		if (estadoActual != null) {
+
+			if (estadoActual.nivel == nivelMaximo) {
+				estadoActual.print();
+				nivelMaximo += 3;
+				estadoActual.genHijos(conecta);
+				estadoActual.print();
+				for (Estado hijo : estadoActual.getListaHijos()) {
+					hijo.print();
+				}
+				nivelMaximo--;
 			}
-			nivelMaximo--;
 		}
+
 		actTableroActual(tablero);
 		int posHijo;
 
 		if (estadoActual != null) {
+			estadoActual.print();
+			for (Estado hijo : estadoActual.getListaHijos()) {
+				hijo.print();
+			}
 			posHijo = jugadaP1(tablero);
 			estadoActual = estadoActual.getHijo(posHijo);
-			nivelActual++;
 		} else {
 			estadoActual = new Estado(null, (byte) 0, (byte) 0, (byte) nivelActual, false, conecta);
 		}
@@ -432,11 +436,11 @@ public class IAPlayer extends Player {
 		// Calcular la mejor columna posible donde hacer nuestra turnoJugada
 		int columna = estadoActual.getMejorJugada();
 		actTableroAnterior(estadoActual.construyeTablero());
-		
+
 		System.out.println("ESTADO FINAL LLAMADA:");
 		estadoActual.print();
 		nivelActual++;
-		
+
 		return tablero.checkWin(tablero.setButton(columna, Conecta4.PLAYER2), columna, conecta);
 
 	}
@@ -502,26 +506,47 @@ public class IAPlayer extends Player {
 		//Cálculo horizontal
 		for (int f = 0; f < tablero.length; f++) {
 			byte inicial = 0;
+			byte ultimo = 2;
 			int suma = 0;
-			boolean continua = true;
+			int contador = 0;
 			int c = 0;
-			while (c < tablero[f].length && continua) {
+			while (c < tablero[f].length) {
 				if (inicial == 0 && tablero[f][c] != 0) {
 					inicial = tablero[f][c];
 					suma = inicial * 10;
+					contador++;
 				} else if (tablero[f][c] != 0) {
 					if (tablero[f][c] == inicial * -1) {
-						suma = 0;
-						continua = false;
-					} else if (tablero[f][c] == inicial) {
+						if(inicial == ultimo || contador >= conecta){
+							sumaTotal += suma;
+						}
+						inicial = tablero[f][c];
+						suma = inicial;
+						contador = 0;
+					} else {
+						if(ultimo == tablero[f][c]){
+							sumaTotal += suma;
+							inicial = tablero[f][c];
+							suma = inicial;
+						}
 						suma *= 10;
+					}
+					contador++;
+				} else {
+					contador++;
+					ultimo = inicial;
+					if (contador >= conecta && suma != 0) {
+						sumaTotal += suma;
+						inicial = tablero[f][c];
+						suma = inicial;
+						contador = 1;
 					}
 				}
 				c++;
 			}
-			sumaTotal += suma;
 		}
 
+		
 		boolean[][] evaluadosID = new boolean[tablero.length][tablero[0].length];
 		boolean[][] evaluadosDI = new boolean[tablero.length][tablero[0].length];
 		for (int i = 0; i < evaluadosID.length; i++) {
@@ -596,6 +621,7 @@ public class IAPlayer extends Player {
 				}
 			}
 		}
+		
 		return sumaTotal;
 	}
 } // IAPlayer
