@@ -42,9 +42,9 @@ public class Conecta4 extends JFrame implements ActionListener {
 
     // Parámetros
     // Número de filas
-    private static final int FILAS = 4;
+    private static final int FILAS = 6;
     // Número de columnas
-    private static final int COLUMNAS = 4;
+    private static final int COLUMNAS = 7;
     // Número de fichas que han de alinearse para ganar
     private static final int CONECTA = 4;
 
@@ -151,8 +151,8 @@ public class Conecta4 extends JFrame implements ActionListener {
                 System.out.println("Winner: Jugador 1, en " + movimiento + " movimientos.");
                 reset();
                 break;
-            case PLAYER2:
-                JOptionPane.showMessageDialog(this, "Winner, Jugador 2\nen " + movimiento + " movimientos!", "Conecta-4", JOptionPane.INFORMATION_MESSAGE, juego.getFicha2());
+            case PLAYER2://"Winner, Jugador 2\nen " + movimiento + " movimientos!\n"
+                JOptionPane.showMessageDialog(this, "Ta ganao la IA en " + movimiento + " movimientos, es muy triste porque te ha\n ganado un algoritmo, pero al menos la practica no estará suspensa", "Conecta-4", JOptionPane.INFORMATION_MESSAGE, juego.getFicha2());
                 System.out.println("Winner: Jugador 2, en " + movimiento + " movimientos.");
                 reset();
                 break;
