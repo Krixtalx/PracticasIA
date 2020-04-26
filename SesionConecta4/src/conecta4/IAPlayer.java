@@ -20,12 +20,16 @@ public class IAPlayer extends Player {
 
 	private Estado estadoActual = null;
 	private byte nivelActual = 0;
-	private int nivelMaximo = 8;
+	private int nivelMaximo = 6;
 	public byte[][] tableroActual;
 	private byte[][] tableroAnterior;
 	//public int conecta;
 	public int generados = 0;
 
+//	public IAPlayer(int lvl) {
+//		super();
+//		nivelMaximo = lvl;
+//	}
 	private class Estado {
 
 		private final ArrayList<Estado> hijos;
@@ -60,8 +64,8 @@ public class IAPlayer extends Player {
 			if (nivel < nivelMaximo) {
 				genHijos(conecta);
 			} else {
-				valor = -1 * calculaValor(construyeTablero(), conecta);
-				//this.print();
+				valor = -1 * calculaValor2(construyeTablero(), conecta);
+//				this.print();
 			}
 		}
 
@@ -158,6 +162,7 @@ public class IAPlayer extends Player {
 		}
 
 		public int getMejorJugada() {
+//			if (nivel % 2 == 0) {
 			int minimax = Byte.MIN_VALUE;
 			for (Estado hijo : hijos) {
 				if (hijo.valor > minimax) {
@@ -165,6 +170,15 @@ public class IAPlayer extends Player {
 					estadoActual = hijo;
 				}
 			}
+//			} else {
+//				int minimax = Byte.MAX_VALUE;
+//				for (Estado hijo : hijos) {
+//					if (hijo.valor < minimax) {
+//						minimax = hijo.valor;
+//						estadoActual = hijo;
+//					}
+//				}
+//			}
 			return estadoActual.movY;
 		}
 
@@ -395,20 +409,20 @@ public class IAPlayer extends Player {
 	 */
 	@Override
 	public int turnoJugada(Grid tablero, int conecta) {
-		System.out.println("actual=" + nivelActual);
-		if(nivelActual == 6){
-			System.out.println("aquiii");
+		System.out.println("act=" + nivelActual);
+		if (nivelActual == 4) {
+			System.out.println("auqi");
 		}
 //		byte tab[][] = {
-//			{0,			0,		0,		0,		0,		0,		0},
-//			{0,			0,		0,		0,		0,		0,		0},
-//			{1,			0,		0,		0,		0,		0,		0},
-//			{-1,		-1,		0,		0,		0,		0,		0},
-//			{-1,		1,		1,		0,		0,		0,		0},
-//			{1,			-1,		-1,		1,		-1,		1,		0},};
-//		System.out.println("valor: " + calculaValor(tab, conecta));
+//			{0, 0, 0, 0, 0, 0, 0},
+//			{0, 0, 0, 0, 0, 0, 0},
+//			{0, 0, 0, 0, 0, 0, 0},
+//			{0, 0, 1, 0, 0, 0, 0},
+//			{0, 0, -1, 1, 1, 0, -1},
+//			{0, 0, -1, -1, -1, 1, 1},
+//			{0, 0, 1, -1, -1, -1, 1},};
+//		System.out.println("valor: " + calculaValor2(tab, conecta));
 //		System.exit(0);
-		
 		generaNiveles(conecta);
 
 		actTableroActual(tablero);
@@ -447,7 +461,26 @@ public class IAPlayer extends Player {
 		// Calcular la mejor columna posible donde hacer nuestra turnoJugada
 		int columna = estadoActual.getMejorJugada();
 
+		if (tableroAnterior != null) {
+			for (byte[] bs : tableroAnterior) {
+				for (byte b : bs) {
+					System.out.printf("%3d", b);
+				}
+				System.out.println("");
+			}
+			System.out.println();
+		}
+		//TODO: aqui hace cosas raras PROBAR COMBO -> 3, 5, 1, 0, 2
 		actTableroAnterior(estadoActual.construyeTablero());
+		if (tableroAnterior != null) {
+			for (byte[] bs : tableroAnterior) {
+				for (byte b : bs) {
+					System.out.printf("%3d", b);
+				}
+				System.out.println("");
+			}
+			System.out.println();
+		}
 
 //		System.out.println("ESTADO FINAL LLAMADA:");
 //		estadoActual.print();
@@ -457,7 +490,7 @@ public class IAPlayer extends Player {
 
 	}
 
-	public void generaNiveles(int conecta){
+	public void generaNiveles(int conecta) {
 		if (estadoActual != null) {
 			if (estadoActual.nivel == nivelMaximo) {
 				System.out.println("======ESTADO ACTUAL=====");
@@ -471,7 +504,7 @@ public class IAPlayer extends Player {
 			}
 		}
 	}
-	
+
 	public void actTableroActual(Grid tablero) {
 		int[][] aux = tablero.toArray();
 		tableroActual = new byte[tablero.getFilas()][tablero.getColumnas()];
@@ -619,10 +652,10 @@ public class IAPlayer extends Player {
 //
 //        boolean[][] evaluadosID = new boolean[tablero.length][tablero[0].length];
 //        boolean[][] evaluadosDI = new boolean[tablero.length][tablero[0].length];
-//        for (int i = 0; i < evaluadosID.length; i++) {
-//            for (int j = 0; j < evaluadosID[i].length; j++) {
-//                evaluadosID[i][j] = false;
-//                evaluadosDI[i][j] = false;
+//        for (int fila = 0; fila < evaluadosID.length; fila++) {
+//            for (int col = 0; col < evaluadosID[fila].length; col++) {
+//                evaluadosID[fila][col] = false;
+//                evaluadosDI[fila][col] = false;
 //            }
 //        }
 //
@@ -691,6 +724,169 @@ public class IAPlayer extends Player {
 //                }
 //            }
 //        }
+		return sumaTotal;
+	}
+
+	public int calculaValor2(byte[][] tablero, int conecta) {
+		int sumaTotal = 0;
+		int sPositiva = 0, sNegativa = 0;
+		for (int fila = 0; fila < tablero.length; fila++) {
+			for (int col = 0; col < tablero[fila].length; col++) {
+				//Vertical
+				if (fila + conecta - 1 < tablero.length) {
+					int inicial = 0;
+					int repeticiones = 0;
+					int mayorRepes = 0;
+					boolean valido = true;
+					for (int posicion = 0; posicion < conecta && valido; posicion++) {
+						if (inicial == 0 && tablero[fila + posicion][col] != 0) {
+							inicial = tablero[fila + posicion][col];
+							repeticiones = 0;
+							repeticiones++;
+						} else if (tablero[fila + posicion][col] == inicial) {
+							repeticiones++;
+						} else if (tablero[fila + posicion][col] == inicial * -1) {
+							valido = false;
+						} else {
+//							if (repeticiones > mayorRepes) {
+//								mayorRepes = repeticiones;
+//							}
+//							repeticiones = 0;
+						}
+					}
+					int sum = 0;
+					if (valido) {
+						if (repeticiones > mayorRepes) {
+							mayorRepes = repeticiones;
+						}
+						sum = (int) Math.pow(10, mayorRepes) * inicial;
+						sumaTotal += sum;
+					}
+					if (sum > 0) {
+						sPositiva += sum;
+					} else {
+						sNegativa -= sum;
+					}
+//					System.out.printf("valorVertical[%d][%d]=%d\n", fila, col, sum);
+				}
+
+				//Horizontal
+				if (col + conecta - 1 < tablero[fila].length) {
+					int inicial = 0;
+					int repeticiones = 0;
+					int mayorRepes = 0;
+					boolean valido = true;
+					for (int posicion = 0; posicion < conecta && valido; posicion++) {
+						if (inicial == 0 && tablero[fila][col + posicion] != 0) {
+							inicial = tablero[fila][col + posicion];
+							repeticiones = 0;
+							repeticiones++;
+						} else if (tablero[fila][col + posicion] == inicial) {
+							repeticiones++;
+						} else if (tablero[fila][col + posicion] == inicial * -1) {
+							valido = false;
+						} else {
+//							if (repeticiones > mayorRepes) {
+//								mayorRepes = repeticiones;
+//							}
+//							repeticiones = 0;
+						}
+					}
+					int sum = 0;
+					if (valido) {
+						if (repeticiones > mayorRepes) {
+							mayorRepes = repeticiones;
+						}
+						sum = (int) Math.pow(10, mayorRepes) * inicial;
+						sumaTotal += sum;
+					}
+					if (sum > 0) {
+						sPositiva += sum;
+					} else {
+						sNegativa -= sum;
+					}
+//					System.out.printf("valorHorizontal[%d][%d]=%d\n", fila, col, sum);
+				}
+
+				//Diagonal \
+				if (fila + conecta - 1 < tablero.length && col + conecta - 1 < tablero[fila].length) {
+					int inicial = 0;
+					int repeticiones = 0;
+					int mayorRepes = 0;
+					boolean valido = true;
+					for (int posicion = 0; posicion < conecta && valido; posicion++) {
+						if (inicial == 0 && tablero[fila + posicion][col + posicion] != 0) {
+							inicial = tablero[fila + posicion][col + posicion];
+							repeticiones = 0;
+							repeticiones++;
+						} else if (tablero[fila + posicion][col + posicion] == inicial) {
+							repeticiones++;
+						} else if (tablero[fila + posicion][col + posicion] == inicial * -1) {
+							valido = false;
+						} else {
+//							if (repeticiones > mayorRepes) {
+//								mayorRepes = repeticiones;
+//							}
+//							repeticiones = 0;
+						}
+					}
+					int sum = 0;
+					if (valido) {
+						if (repeticiones > mayorRepes) {
+							mayorRepes = repeticiones;
+						}
+						sum = (int) Math.pow(10, mayorRepes) * inicial;
+						sumaTotal += sum;
+					}
+					if (sum > 0) {
+						sPositiva += sum;
+					} else {
+						sNegativa -= sum;
+					}
+//					System.out.printf("valorDiagonal\\[%d][%d]=%d\n", fila, col, sum);
+				}
+
+				//Diagonal /
+				if (fila + conecta - 1 < tablero.length && col >= conecta - 1) {
+					int inicial = 0;
+					int repeticiones = 0;
+					int mayorRepes = 0;
+					boolean valido = true;
+					for (int posicion = 0; posicion < conecta && valido; posicion++) {
+						if (inicial == 0 && tablero[fila + posicion][col - posicion] != 0) {
+							inicial = tablero[fila + posicion][col - posicion];
+							repeticiones = 0;
+							repeticiones++;
+						} else if (tablero[fila + posicion][col - posicion] == inicial) {
+							repeticiones++;
+						} else if (tablero[fila + posicion][col - posicion] == inicial * -1) {
+							valido = false;
+						} else {
+//							if (repeticiones > mayorRepes) {
+//								mayorRepes = repeticiones;
+//							}
+//							repeticiones = 0;
+						}
+					}
+					int sum = 0;
+					if (valido) {
+						if (repeticiones > mayorRepes) {
+							mayorRepes = repeticiones;
+						}
+						sum = (int) Math.pow(10, mayorRepes) * inicial;
+						sumaTotal += sum;
+					}
+					if (sum > 0) {
+						sPositiva += sum;
+					} else {
+						sNegativa -= sum;
+					}
+//					System.out.printf("valorDiagonal/[%d][%d]=%d\n", fila, col, sum);
+				}
+//				System.out.println("");
+			}
+		}
+//		System.out.println("J-1=" + sNegativa + "\nJ1=" + sPositiva);
 		return sumaTotal;
 	}
 } // IAPlayer
