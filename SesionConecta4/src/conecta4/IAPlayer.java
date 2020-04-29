@@ -19,11 +19,10 @@ import java.util.Stack;
 public class IAPlayer extends Player {
 
 	private Estado estadoActual = null;
-	private byte nivelActual = 0;
-	private int nivelMaximo = 6;
-	public byte[][] tableroActual;
-	private byte[][] tableroAnterior;
-	//public int conecta;
+	private int nivelActual = 0;
+	private int nivelMaximo = 8;
+	public int[][] tableroActual;
+	private int[][] tableroAnterior;
 	public int generados = 0;
 
 //	public IAPlayer(int lvl) {
@@ -35,14 +34,16 @@ public class IAPlayer extends Player {
 		private final ArrayList<Estado> hijos;
 
 		private final Estado padre;
-		private final byte movX;
-		private final byte movY;
-		private final byte nivel;
+		private final int movX;
+		private final int movY;
+		private final int nivel;
 		private final boolean estFinal;
 
 		private int valor;
+		private int alfa;
+		private int beta;
 
-		public Estado(Estado padre, byte movX, byte movY, byte nivel, boolean estFinal, int conecta) {
+		public Estado(Estado padre, int movX, int movY, int nivel, boolean estFinal, int conecta) {
 			if (!estFinal) {
 				this.hijos = new ArrayList();
 			} else {
@@ -53,6 +54,13 @@ public class IAPlayer extends Player {
 			this.movY = movY;//Columna
 			this.nivel = nivel;
 			this.estFinal = estFinal;
+			if (padre != null) {
+				this.alfa = padre.alfa;
+				this.beta = padre.beta;
+			} else {
+				this.alfa = Integer.MIN_VALUE;
+				this.beta = Integer.MAX_VALUE;
+			}
 
 			if (nivel % 2 == 0) {
 				valor = Integer.MIN_VALUE;
@@ -71,8 +79,9 @@ public class IAPlayer extends Player {
 
 		private void genHijos(int conecta) {
 			if (!estFinal) {
-				byte[][] tableroAux = construyeTablero();
-				for (int i = 0; i < tableroActual[0].length; i++) {
+				int[][] tableroAux = construyeTablero();
+				boolean podar = false;
+				for (int i = 0; i < tableroActual[0].length && !podar; i++) {
 					boolean encontrado = false;
 					int j;
 					for (j = tableroActual.length - 1; j >= 0 && !encontrado; j--) {
@@ -82,7 +91,7 @@ public class IAPlayer extends Player {
 						}
 					}
 					if (encontrado) {
-						byte[][] tableroEstadoHijo = new byte[tableroActual.length][tableroActual[0].length];
+						int[][] tableroEstadoHijo = new int[tableroActual.length][tableroActual[0].length];
 						for (int k = 0; k < tableroActual.length; k++) {
 							System.arraycopy(tableroAux[k], 0, tableroEstadoHijo[k], 0, tableroAux[0].length);
 						}
@@ -95,8 +104,8 @@ public class IAPlayer extends Player {
 						if (nivel >= conecta) {
 							estadoFinalHijo = comprobarVictoria(tableroEstadoHijo, j, i, conecta) != 0;
 //							if (estadoFinalHijo) {
-//								for (byte[] bs : tableroEstadoHijo) {
-//									for (byte b : bs) {
+//								for (int[] bs : tableroEstadoHijo) {
+//									for (int b : bs) {
 //										System.out.printf("%3d", b);
 //									}
 //									System.out.println("");
@@ -105,15 +114,35 @@ public class IAPlayer extends Player {
 //							}
 						}
 
-						Estado nuevo = new Estado(this, (byte) j, (byte) i, (byte) (nivel + 1), estadoFinalHijo, conecta);
+						Estado nuevo = new Estado(this, j, i, (nivel + 1), estadoFinalHijo, conecta);
 						hijos.add(nuevo);
 						if (nivel % 2 == 0) {
-							if (nuevo.valor > this.valor) {
-								this.valor = nuevo.valor;
+							if (nuevo.valor < this.beta) {
+								if (nuevo.valor > this.valor) {
+									this.valor = nuevo.valor;
+									this.alfa = nuevo.valor;
+								}
+							} else {
+								if (nuevo.valor > this.valor) {
+									this.valor = nuevo.valor;
+								}
+								podar = true;
 							}
 						} else {
+//							if (nuevo.valor > this.alfa) {
+//								if (nuevo.valor < this.valor) {
+//									this.valor = nuevo.valor;
+//									this.beta = nuevo.valor;
+//								}
+//							} else {
+//								if (nuevo.valor < this.valor) {
+//									this.valor = nuevo.valor;
+//								}
+//								podar = true;
+//							}
 							if (nuevo.valor < this.valor) {
 								this.valor = nuevo.valor;
+								this.beta = nuevo.valor;
 							}
 						}
 					}
@@ -162,28 +191,18 @@ public class IAPlayer extends Player {
 		}
 
 		public int getMejorJugada() {
-//			if (nivel % 2 == 0) {
-			int minimax = Byte.MIN_VALUE;
+			int minimax = Integer.MIN_VALUE;
 			for (Estado hijo : hijos) {
 				if (hijo.valor > minimax) {
 					minimax = hijo.valor;
 					estadoActual = hijo;
 				}
 			}
-//			} else {
-//				int minimax = Byte.MAX_VALUE;
-//				for (Estado hijo : hijos) {
-//					if (hijo.valor < minimax) {
-//						minimax = hijo.valor;
-//						estadoActual = hijo;
-//					}
-//				}
-//			}
 			return estadoActual.movY;
 		}
 
-		public byte[][] construyeTablero() {
-			byte[][] tablero = new byte[tableroActual.length][tableroActual[0].length];
+		public final int[][] construyeTablero() {
+			int[][] tablero = new int[tableroActual.length][tableroActual[0].length];
 			for (int k = 0; k < tableroActual.length; k++) {
 				System.arraycopy(tableroActual[k], 0, tablero[k], 0, tableroActual[0].length);
 			}
@@ -207,11 +226,11 @@ public class IAPlayer extends Player {
 		}
 
 		public void print() {
-			byte[][] tableroEstado = construyeTablero();
+			int[][] tableroEstado = construyeTablero();
 			System.out.println("EstadoFinal: " + estFinal);
 			System.out.println("Nivel " + nivel);
 			System.out.println("Valor: " + valor);
-			for (byte[] tableroEstado1 : tableroEstado) {
+			for (int[] tableroEstado1 : tableroEstado) {
 				for (int j = 0; j < tableroEstado[0].length; j++) {
 					System.out.print(tableroEstado1[j] + "	");
 				}
@@ -241,7 +260,7 @@ public class IAPlayer extends Player {
 			return hijos;
 		}
 
-		public int comprobarVictoria(byte[][] estTablero, int x, int y, int conecta) {
+		public int comprobarVictoria(int[][] estTablero, int x, int y, int conecta) {
 			/*
 			*	x fila
 			*	y columna
@@ -409,11 +428,11 @@ public class IAPlayer extends Player {
 	 */
 	@Override
 	public int turnoJugada(Grid tablero, int conecta) {
-		System.out.println("act=" + nivelActual);
-		if (nivelActual == 4) {
-			System.out.println("auqi");
+		System.out.println("actual=" + nivelActual);
+		if (nivelActual == 5) {
+			System.out.println("aqui");
 		}
-//		byte tab[][] = {
+//		int tab[][] = {
 //			{0, 0, 0, 0, 0, 0, 0},
 //			{0, 0, 0, 0, 0, 0, 0},
 //			{0, 0, 0, 0, 0, 0, 0},
@@ -429,61 +448,16 @@ public class IAPlayer extends Player {
 		int posHijo;
 
 		if (estadoActual != null) {
-//			estadoActual.print();
-//			Estado temp = estadoActual;
-//			try {
-//				while (true) {
-//					temp.print();
-//					temp = temp.getListaHijos().get(0);
-//				}
-//			} catch (NullPointerException | IndexOutOfBoundsException e) {
-//				System.out.println("ended");
-//			}
-//			temp = temp.padre;
-//			for (Estado hijo : temp.hijos) {
-//				hijo.print();
-//			}
 			posHijo = jugadaP1(tablero);
 			estadoActual = estadoActual.getHijo(posHijo);
 			generaNiveles(conecta);
 		} else {
-			estadoActual = new Estado(null, (byte) 0, (byte) 0, (byte) nivelActual, false, conecta);
+			estadoActual = new Estado(null, 0, 0, nivelActual, false, conecta);
 		}
 
-		//System.out.println("----ESTADO ACTUAL----");
-		//estadoActual.print();
-		//estadoActual.printHijos();
-//        System.out.println("----RAMA ALEATORIA----");
-//        mostrarRama();
-//        System.out.println("----FIN RAMA ALEATORIA----");
-		/*new Scanner(System.in).nextLine();
-		 */
 		// Calcular la mejor columna posible donde hacer nuestra turnoJugada
 		int columna = estadoActual.getMejorJugada();
-
-		if (tableroAnterior != null) {
-			for (byte[] bs : tableroAnterior) {
-				for (byte b : bs) {
-					System.out.printf("%3d", b);
-				}
-				System.out.println("");
-			}
-			System.out.println();
-		}
-		//TODO: aqui hace cosas raras PROBAR COMBO -> 3, 5, 1, 0, 2
 		actTableroAnterior(estadoActual.construyeTablero());
-		if (tableroAnterior != null) {
-			for (byte[] bs : tableroAnterior) {
-				for (byte b : bs) {
-					System.out.printf("%3d", b);
-				}
-				System.out.println("");
-			}
-			System.out.println();
-		}
-
-//		System.out.println("ESTADO FINAL LLAMADA:");
-//		estadoActual.print();
 		nivelActual++;
 
 		return tablero.checkWin(tablero.setButton(columna, Conecta4.PLAYER2), columna, conecta);
@@ -493,30 +467,24 @@ public class IAPlayer extends Player {
 	public void generaNiveles(int conecta) {
 		if (estadoActual != null) {
 			if (estadoActual.nivel == nivelMaximo) {
-				System.out.println("======ESTADO ACTUAL=====");
-				estadoActual.print();
 				nivelMaximo += 2;
 				estadoActual.genHijos(conecta);
-				estadoActual.print();
-				System.out.println("INICIO RAMA");
-				mostrarRama();
-				System.out.println("Generado nuevo lvl");
 			}
 		}
 	}
 
 	public void actTableroActual(Grid tablero) {
 		int[][] aux = tablero.toArray();
-		tableroActual = new byte[tablero.getFilas()][tablero.getColumnas()];
+		tableroActual = new int[tablero.getFilas()][tablero.getColumnas()];
 		for (int i = 0; i < tablero.getFilas(); i++) {
 			for (int j = 0; j < tablero.getColumnas(); j++) {
-				tableroActual[i][j] = (byte) aux[i][j];
+				tableroActual[i][j] = aux[i][j];
 			}
 		}
 	}
 
-	public void actTableroAnterior(byte[][] tablero) {
-		tableroAnterior = new byte[tablero.length][tablero[0].length];
+	public void actTableroAnterior(int[][] tablero) {
+		tableroAnterior = new int[tablero.length][tablero[0].length];
 		for (int i = 0; i < tablero.length; i++) {
 			System.arraycopy(tablero[i], 0, tableroAnterior[i], 0, tablero[i].length);
 		}
@@ -544,12 +512,12 @@ public class IAPlayer extends Player {
 		}
 	}
 
-	public int calculaValor(byte[][] tablero, int conecta) {
+	public int calculaValor(int[][] tablero, int conecta) {
 		int sumaTotal = 0;
 
 		//Cálculo vertical
 		for (int c = 0; c < tablero[0].length; c++) {
-			byte inicial = 0;
+			int inicial = 0;
 			int sumaFinal = 0;
 			int repetidos = 1;
 			int cerosRepetidos = 0;
@@ -600,7 +568,7 @@ public class IAPlayer extends Player {
 
 		//Cálculo horizontal
 		for (int f = 0; f < tablero.length; f++) {
-			byte inicial = 0;
+			int inicial = 0;
 			int sumaFinal = 0;
 			int repetidos = 1;
 			int cerosRepetidos = 0;
@@ -727,7 +695,7 @@ public class IAPlayer extends Player {
 		return sumaTotal;
 	}
 
-	public int calculaValor2(byte[][] tablero, int conecta) {
+	public int calculaValor2(int[][] tablero, int conecta) {
 		int sumaTotal = 0;
 		int sPositiva = 0, sNegativa = 0;
 		for (int fila = 0; fila < tablero.length; fila++) {
