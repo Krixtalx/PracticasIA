@@ -31,7 +31,7 @@ public class IAPlayer extends Player {
 	/**
 	 * Nivel máximo hasta el que se genera el árbol
 	 */
-	private int nivelMaximo = 4;
+	private int nivelMaximo = 8;
 
 	/**
 	 * Número de niveles adicionales que se generan al alcanzar el límite
@@ -56,7 +56,7 @@ public class IAPlayer extends Player {
 		/**
 		 * Colección de los estados hijo del nodo actual
 		 */
-		private final ArrayList<Estado> hijos;
+		private ArrayList<Estado> hijos;
 
 		/**
 		 * Referencia al estado padre
@@ -110,6 +110,7 @@ public class IAPlayer extends Player {
 		 */
 		public Estado(Estado padre, int movX, int movY, int nivel, boolean estFinal, int conecta, int ganador) {
 
+			this.hijos = null;
 			this.padre = padre;
 			this.movX = movX;//Fila
 			this.movY = movY;//Columna
@@ -129,26 +130,23 @@ public class IAPlayer extends Player {
 			} else {
 				valor = Integer.MAX_VALUE;
 			}
-			if (!estFinal) {
-				this.hijos = new ArrayList();
-			} else {
-				if (ganador == 0) {
-					valor = 0;
-				} else if (ganador == Conecta4.PLAYER1) {
+
+			if (estFinal) {
+				if (ganador == Conecta4.PLAYER1) {
 					valor = Integer.MIN_VALUE;
 				} else {
 					valor = Integer.MAX_VALUE;
 				}
-				this.hijos = null;
+			} else {
+				if (nivel == nivelMaximo) {
+					valor = -1 * calculaValor(construyeTablero(), conecta);
+				} else {
+					genHijos(conecta);
+				}
 			}
 
 			//Genera hijos hasta llegar al nivel límite, tras lo cual obtiene
 			//el valor heurístico del tablero para propagar hacia los padres
-			if (nivel < nivelMaximo) {
-				genHijos(conecta);
-			} else {
-				valor = -1 * calculaValor(construyeTablero(), conecta);
-			}
 		}
 
 		/**
@@ -160,6 +158,9 @@ public class IAPlayer extends Player {
 		private void genHijos(int conecta) {
 			//Genera para todos los nodos no terminales
 			if (!estFinal) {
+				if (hijos == null) {
+					hijos = new ArrayList();
+				}
 				int[][] tableroAux = construyeTablero();
 				boolean podar = false;
 				//Prueba en todas las casillas válidas mientras no sea necesario podar
@@ -204,7 +205,7 @@ public class IAPlayer extends Player {
 							}
 
 							if (alfa >= beta) {
-								podar = true;
+//								podar = true;
 							}
 						} else {
 							if (nuevo.valor < this.valor) {
@@ -215,7 +216,7 @@ public class IAPlayer extends Player {
 							}
 
 							if (alfa >= beta) {
-								podar = true;
+//								podar = true;
 							}
 						}
 
