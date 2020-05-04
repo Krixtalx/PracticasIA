@@ -134,12 +134,18 @@ public class IAPlayer extends Player {
             if (estFinal) {
                 if (ganador == Conecta4.PLAYER1) {
                     valor = Integer.MIN_VALUE;
+                    alfa = valor;
+                    beta = valor;
                 } else {
                     valor = Integer.MAX_VALUE;
+                    alfa = valor;
+                    beta = valor;
                 }
             } else {
                 if (nivel == nivelMaximo) {
                     valor = -1 * calculaValor(construyeTablero(), conecta);
+                    alfa = valor;
+                    beta = valor;
                 } else {
                     genHijos(conecta);
                 }
@@ -197,29 +203,54 @@ public class IAPlayer extends Player {
 
                         //Realizamos la poda Alfa-Beta
                         if (nivel % 2 == 0) {
-                            if (nuevo.valor > this.valor) {
+                            if (this.valor < nuevo.valor) {
                                 this.valor = nuevo.valor;
                             }
-                            if (nuevo.valor > this.alfa) {
-                                this.valor = nuevo.valor;
+                            if (this.alfa < nuevo.beta) {
                                 this.alfa = nuevo.valor;
                             }
 
-                            if (alfa >= beta) {
+                            if (this.alfa > this.beta) {
                                 podar = true;
                             }
+
                         } else {
-                            if (nuevo.valor < this.beta) {
-                                this.beta = nuevo.valor;
+                            if (this.valor > nuevo.valor) {
                                 this.valor = nuevo.valor;
                             }
-
-                            if (alfa >= beta) {
+                            if (this.beta > nuevo.valor) {
+                                this.beta = nuevo.valor;
+                            }
+                            if (this.alfa > this.beta) {
                                 podar = true;
                             }
                         }
 
                     }
+                }
+            }
+        }
+
+        public void ampliaNivel(int conecta) {
+            if (!estFinal) {
+                if (nivel < nivelMaximo - 2) {
+                    for (Estado hijo : hijos) {
+                        hijo.ampliaNivel(conecta);
+//                        if (nivel % 2 == 0) {
+//                            if (hijo.beta > this.alfa) {
+//                                this.alfa = hijo.beta;
+//                                this.valor = hijo.valor;
+//                            }
+//                        } else {
+//
+//                            if (hijo.alfa < this.beta) {
+//                                this.beta = hijo.alfa;
+//                                this.valor = hijo.valor;
+//                            }
+//                        }
+                    }
+                } else {
+                    genHijos(conecta);
                 }
             }
         }
@@ -278,6 +309,8 @@ public class IAPlayer extends Player {
             System.out.println("EstadoFinal: " + estFinal);
             System.out.println("Nivel " + nivel);
             System.out.println("Valor: " + valor);
+            System.out.println("Alfa: " + alfa);
+            System.out.println("Beta: " + beta);
             for (int[] tableroEstado1 : tableroEstado) {
                 for (int j = 0; j < tableroEstado[0].length; j++) {
                     System.out.print(tableroEstado1[j] + "	");
@@ -501,9 +534,6 @@ public class IAPlayer extends Player {
     @Override
     public int turnoJugada(Grid tablero, int conecta) {
         System.out.println("Nivel Actual: " + nivelActual);
-        if (nivelActual == 18) {
-            System.out.println("aqui");
-        }
         generaNiveles(conecta, tablero.getFilas() * tablero.getColumnas() - 1);
 
         actTableroActual(tablero);
@@ -516,11 +546,10 @@ public class IAPlayer extends Player {
             Estado padreTemp = estadoActual;
             estadoActual = estadoActual.getHijo(posHijo[1]);
             if (estadoActual == null) {
-                padreTemp.alfa = Integer.MIN_VALUE;
-                padreTemp.beta = Integer.MAX_VALUE;
-                estadoActual = new Estado(null, posHijo[0], posHijo[1], nivelEstado + 1, false, conecta, 0);
+                estadoActual = new Estado(padreTemp, posHijo[0], posHijo[1], nivelEstado + 1, false, conecta, 0);
             }
             generaNiveles(conecta, tablero.getFilas() * tablero.getColumnas() - 1);
+            //estadoActual.ampliaNivel(conecta);
         } else {
             estadoActual = new Estado(null, 0, 0, nivelActual, false, conecta, 0);
         }
@@ -529,7 +558,7 @@ public class IAPlayer extends Player {
         int columna = estadoActual.getMejorJugada();
         actTableroAnterior(estadoActual.construyeTablero());
         nivelActual += 2;
-
+        //nivelMaximo += 2;
         return tablero.checkWin(tablero.setButton(columna, Conecta4.PLAYER2), columna, conecta);
 
     }
