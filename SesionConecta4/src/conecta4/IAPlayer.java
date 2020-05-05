@@ -201,7 +201,7 @@ public class IAPlayer extends Player {
                                     this.valor = nuevo.valor;
                                 }
 
-                                if (this.beta < nuevo.valor) {
+                                if (this.beta <= nuevo.valor) {
                                     podar = true;
                                 } else if (this.alfa < nuevo.valor) {
                                     this.alfa = nuevo.valor;
@@ -212,7 +212,7 @@ public class IAPlayer extends Player {
                                     this.valor = nuevo.valor;
                                 }
 
-                                if (this.alfa > nuevo.valor) {
+                                if (this.alfa >= nuevo.valor) {
                                     podar = true;
                                 } else if (this.beta > nuevo.valor) {
                                     this.beta = nuevo.valor;
@@ -537,7 +537,13 @@ public class IAPlayer extends Player {
             padreTemp.beta = Integer.MAX_VALUE;
             estadoActual = estadoActual.getHijo(posHijo[1]);
             if (estadoActual == null) {
-                estadoActual = new Estado(padreTemp, posHijo[0], posHijo[1], nivelEstado + 1, false, conecta, 0);
+				if (padreTemp.nivel % 2 == 0) {
+					padreTemp.valor = Integer.MIN_VALUE;
+				}else{
+					padreTemp.valor = Integer.MAX_VALUE;
+				}
+				boolean estadoFin = padreTemp.comprobarVictoria(padreTemp.construyeTablero(), posHijo[0], posHijo[1], conecta) != 0;
+                estadoActual = new Estado(padreTemp, posHijo[0], posHijo[1], nivelEstado + 1, estadoFin, conecta, 0);
             }
             //generaNiveles(conecta, tablero.getFilas() * tablero.getColumnas() - 1);
             estadoActual.ampliaNivel(conecta);
@@ -754,3 +760,4 @@ public class IAPlayer extends Player {
         return sumaTotal;
     }
 } // IAPlayer
+//Version ultima con cosas
